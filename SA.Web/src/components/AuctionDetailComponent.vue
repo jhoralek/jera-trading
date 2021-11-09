@@ -396,7 +396,7 @@ export default class AuctionDetalComponent extends BaseComponent {
     }
 
     private mounted() {
-        if (this.record.id === undefined) {
+        if (this.record.id !== undefined) {
             this.detail(this.$route.query.id).then((result) => {
                 clearInterval(this.checkEndAucitonCoutner);
                 this.startCheckEndAuction();

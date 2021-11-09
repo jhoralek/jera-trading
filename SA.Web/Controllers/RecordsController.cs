@@ -1,13 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper.QueryableExtensions;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SA.Application.Records;
 using SA.Core.Model;
 using SA.EntityFramework.EntityFramework.Repository;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SA.WebApi.Controllers
 {
@@ -15,8 +15,12 @@ namespace SA.WebApi.Controllers
     public class RecordsController : BaseController<Record>
     {
         private IEntityRepository<Auction> _auctionRepo;
-        public RecordsController(IEntityRepository<Record> repository, IEntityRepository<Auction> auctionRepo)
-            : base(repository) {
+        public RecordsController(
+                IEntityRepository<Record> repository,
+                IEntityRepository<Auction> auctionRepo,
+                IMapper mapper)
+            : base(repository, mapper)
+        {
             _auctionRepo = auctionRepo;
         }
 
@@ -83,7 +87,7 @@ namespace SA.WebApi.Controllers
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] Record record)
         {
-                var persistedItem = await _repository.GetOneAsync<Record>(x => x.Id == record.Id);
+            var persistedItem = await _repository.GetOneAsync<Record>(x => x.Id == record.Id);
             if (record == null && persistedItem == null)
             {
                 return BadRequest();
@@ -117,32 +121,30 @@ namespace SA.WebApi.Controllers
         [HttpGet]
         [Route("getAllForAdmin")]
         public async Task<IActionResult> GetAllForAdmin()
-            => Json(await _repository.Context.Records
-                .Include(x => x.User)
-                .Include(x => x.Bids)
-                .Include(x => x.Files)
-                .OrderByDescending(x => x.Auction.IsActive)
-                .ThenByDescending(x => x.IsActive)
-                .ThenByDescending(x => x.ValidFrom)
-                .ThenByDescending(x => x.ValidTo)
-                .ProjectTo<RecordTableDto>()
+            => Json(await _mapper.ProjectTo<RecordTableDto>(_repository.Context.Records
+                    .Include(x => x.User)
+                    .Include(x => x.Bids)
+                    .Include(x => x.Files)
+                    .OrderByDescending(x => x.Auction.IsActive)
+                    .ThenByDescending(x => x.IsActive)
+                    .ThenByDescending(x => x.ValidFrom)
+                    .ThenByDescending(x => x.ValidTo))
                 .ToListAsync());
 
         [Authorize("admin")]
         [HttpGet("{id}")]
         [Route("getAuctionRecordsForAdmin")]
         public async Task<IActionResult> GetAuctionRecordsForAdmin(int id)
-            => Json(await _repository.Context.Records
-                .Where(x => x.AuctionId == id)
-                .Include(x => x.User)
-                .Include(x => x.Bids)
-                .Include(x => x.Files)
-                .OrderByDescending(x => x.Auction.IsActive)
-                .ThenByDescending(x => x.IsActive)
-                .ThenByDescending(x => x.ValidFrom)
-                .ThenByDescending(x => x.ValidTo)
-                .ProjectTo<RecordTableDto>()
-                .ToListAsync());
+            => Json(await _mapper.ProjectTo<RecordTableDto>(_repository.Context.Records
+                    .Where(x => x.AuctionId == id)
+                    .Include(x => x.User)
+                    .Include(x => x.Bids)
+                    .Include(x => x.Files)
+                    .OrderByDescending(x => x.Auction.IsActive)
+                    .ThenByDescending(x => x.IsActive)
+                    .ThenByDescending(x => x.ValidFrom)
+                    .ThenByDescending(x => x.ValidTo))
+                .ToListAsync());          
 
         [Authorize("admin")]
         [HttpDelete("{id}")]

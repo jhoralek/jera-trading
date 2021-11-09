@@ -37,3 +37,4 @@ pi-init
 
 /SA.Web/appsettings.Qa.json
 /SA.Web/appsettings.Production.json
+/SA.Web/appsettings.Development.json

@@ -77,7 +77,7 @@ export default class Carousel extends BaseComponent {
   }
 
   private mounted() {
-    this.sliderWidth = this.$el.offsetWidth;
+    this.sliderWidth = 0;
     this.setTake();
   }
 

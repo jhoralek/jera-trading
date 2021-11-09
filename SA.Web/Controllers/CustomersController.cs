@@ -1,18 +1,20 @@
-﻿using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SA.Application.Customer;
 using SA.Core.Model;
 using SA.EntityFramework.EntityFramework.Repository;
+using System.Threading.Tasks;
 
 namespace SA.WebApi.Controllers
 {
     [Route("api/Customers")]
     public class CustomersController : BaseController<Customer>
     {
-        public CustomersController(IEntityRepository<Customer> repository)
-            : base(repository) { }
+        public CustomersController(
+            IEntityRepository<Customer> repository,
+            IMapper mapper)
+            : base(repository, mapper) { }
 
         [Authorize("read:messages")]
         [HttpGet]
@@ -28,8 +30,8 @@ namespace SA.WebApi.Controllers
             {
                 return BadRequest();
             }
-            Mapper.Map(customer, item);
-            return Json(await _repository.UpdateAsync(item));
+            //Mapper.Map(customer, item);
+            return Json(await _repository.UpdateAsync(customer));
         }
 
         [HttpGet("{customerId}")]

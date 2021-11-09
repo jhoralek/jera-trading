@@ -1,4 +1,4 @@
-﻿using AutoMapper.QueryableExtensions;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,8 +15,8 @@ namespace Sa.WebApi.Controllers
     [Route("api/Auctions")]
     public class AuctionsController : BaseController<Auction>
     {
-        public AuctionsController(IEntityRepository<Auction> repository)
-            : base(repository) { }
+        public AuctionsController(IEntityRepository<Auction> repository, IMapper mapper)
+            : base(repository, mapper) { }
 
         [HttpGet]
         [Route("getAllActive")]
@@ -66,13 +66,14 @@ namespace Sa.WebApi.Controllers
         [HttpGet]
         [Route("getAllForAdmin")]
         public async Task<IActionResult> GetAllForAdmin()
-            => Json(await _repository.Context.Auctions
-                .Include(x => x.Records)
-                .OrderByDescending(x => x.IsActive)
-                .ThenByDescending(x => x.ValidFrom)
-                .ThenByDescending(x => x.ValidTo)
-                .ProjectTo<AuctionTableDto>()
-                .ToListAsync());        
+            => Json(await _mapper.ProjectTo<AuctionTableDto>(
+                _repository.Context.Auctions
+                    .Include(x => x.Records)
+                    .OrderByDescending(x => x.IsActive)
+                    .ThenByDescending(x => x.ValidFrom)
+                    .ThenByDescending(x => x.ValidTo))
+                .ToListAsync());
+
 
         [Authorize("admin")]
         [HttpDelete("{id}")]
@@ -100,12 +101,12 @@ namespace Sa.WebApi.Controllers
         [Authorize("admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllLookup()
-            => Json(await _repository.Context.Auctions
-                .Include(x => x.Records)
-                .OrderByDescending(x => x.IsActive)
-                .ThenByDescending(x => x.ValidFrom)
-                .ThenByDescending(x => x.ValidTo)
-                .ProjectTo<AuctionLookupDto>()
-                .ToListAsync());        
+            => Json(await _mapper
+                .ProjectTo<AuctionLookupDto>(_repository.Context.Auctions
+                    .Include(x => x.Records)
+                    .OrderByDescending(x => x.IsActive)
+                    .ThenByDescending(x => x.ValidFrom)
+                    .ThenByDescending(x => x.ValidTo))
+                .ToListAsync());
     }
 }

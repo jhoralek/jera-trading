@@ -1,20 +1,13 @@
-﻿using MySql.Data.EntityFrameworkCore.DataAnnotations;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SA.Core.Model
 {
-    [MySqlCharset("utf8")]
-    [MySqlCollation("utf8_general_ci")]
     public class File : Entity<int>
     {
         [Required]
-        [MySqlCharset("utf8")]
-        [MySqlCollation("utf8_general_ci")]
         public virtual string Name { get; set; }
 
-        [Required]
-        [MySqlCharset("utf8")]
-        [MySqlCollation("utf8_general_ci")]
+        [Required]        
         public virtual string Path { get; set; }
 
         [Required]

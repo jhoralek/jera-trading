@@ -10,8 +10,8 @@ namespace SA.WebApi.Controllers
     [Route("api/Addresses")]
     public class AddressesController : BaseController<Address>
     {
-        public AddressesController(IEntityRepository<Address> repository)
-            : base(repository) { }
+        public AddressesController(IEntityRepository<Address> repository, IMapper mapper)
+            : base(repository, mapper) { }
 
         [Authorize("read:messages")]
         [HttpPut]
@@ -22,7 +22,7 @@ namespace SA.WebApi.Controllers
             {
                 return BadRequest();
             }
-            Mapper.Map(address, item);
+            //Mapper.Map(address, item);
             return Json(await _repository.UpdateAsync(item));
         }
     }

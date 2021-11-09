@@ -1,4 +1,4 @@
-﻿using AutoMapper.QueryableExtensions;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -27,8 +27,9 @@ namespace SA.WebApi.Controllers
             IEntityRepository<Record> recordRepository,
             IEntityRepository<Auction> auctionRepository,
             IEntityRepository<User> userRepository,
-            IUserEmailFactory userEmailFactory)
-            : base(repository)
+            IUserEmailFactory userEmailFactory,
+            IMapper mapper)
+            : base(repository, mapper)
         {
             _recordRepository = recordRepository;
             _auctionRepository = auctionRepository;
@@ -59,11 +60,10 @@ namespace SA.WebApi.Controllers
         [HttpGet("{id}")]
         [Route("getRecordsLastBid")]
         public async Task<IActionResult> GetRecordsLastBid(int id)
-            => Json(await _repository.Context.Bids
-                .Where(x => x.RecordId == id)
-                .OrderByDescending(x => x.Created)
-                .Take(1)
-                .ProjectTo<BidSimpleDto>()
+            => Json(await _mapper.ProjectTo<BidSimpleDto>(_repository.Context.Bids
+                    .Where(x => x.RecordId == id)
+                    .OrderByDescending(x => x.Created)
+                    .Take(1))
                 .FirstOrDefaultAsync());
 
         [Authorize("read:messages")]
@@ -151,7 +151,7 @@ namespace SA.WebApi.Controllers
 
                 return Json(true);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return Json(false);
             }

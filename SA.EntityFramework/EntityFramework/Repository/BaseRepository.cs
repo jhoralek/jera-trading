@@ -13,15 +13,17 @@ namespace SA.EntityFramework.EntityFramework.Repository
     public abstract class BaseRepository<T> where T : Entity<int>
     {
         protected readonly SaDbContext _context;
+        protected readonly IMapper _mapper;
+
         public SaDbContext Context { get { return _context; } }
-        public BaseRepository(SaDbContext context)
+        public BaseRepository(SaDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public virtual async Task<T> AddAsync(T item)
         {
-            item.Created = DateTime.Now;
             var added = await _context.AddAsync(item);
             await _context.SaveChangesAsync();
             return added.Entity;
@@ -46,7 +48,7 @@ namespace SA.EntityFramework.EntityFramework.Repository
 
             if (itemToUpdate != null)
             {
-                Mapper.Map(item, itemToUpdate);
+                _mapper.Map(item, itemToUpdate);
                 await _context.SaveChangesAsync();
                 return itemToUpdate;
             }
@@ -77,15 +79,13 @@ namespace SA.EntityFramework.EntityFramework.Repository
                 request = request.Take(take.Value);
             }
 
-            return await request.ProjectTo<TResult>().ToListAsync();
+            return await _mapper.ProjectTo<TResult>(request).ToListAsync();
         }
 
         public virtual async Task<TResult> GetOneAsync<TResult>(Expression<Func<T, bool>> query)
             where TResult : class
-            => await GetIncludedAll().Where(query)
-                    .ProjectTo<TResult>()
-                    .FirstOrDefaultAsync();
-
+            => await _mapper.ProjectTo<TResult>(GetIncludedAll().Where(query)).FirstOrDefaultAsync();
+                    
         protected virtual IQueryable<T> GetIncludedAll()
             => throw new NotImplementedException();
     }

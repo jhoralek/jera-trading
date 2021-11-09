@@ -28,8 +28,8 @@ namespace SA.WebApi.Controllers
         public async Task<IActionResult> UserValidation(string token)
         {
             var record = await _userActivationsRepositiory
-                .GetOneAsync<UserActivation>(x => 
-                    x.Token == token && 
+                .GetOneAsync<UserActivation>(x =>
+                    x.Token == token &&
                     !x.IsUsed);
 
             if (record == null) return Redirect($"{_configuration["Web:Url"]}/validation-expired");
@@ -57,7 +57,7 @@ namespace SA.WebApi.Controllers
             if (record == null) return Redirect($"{_configuration["Web:Url"]}/password-reset-failed");
 
             record.IsUsed = true;
-            await _userActivationsRepositiory.UpdateAsync(record);         
+            await _userActivationsRepositiory.UpdateAsync(record);
 
             return Redirect($"{_configuration["Web:Url"]}/password-reset?token={token}");
         }

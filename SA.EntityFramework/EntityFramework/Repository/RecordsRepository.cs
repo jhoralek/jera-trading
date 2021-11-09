@@ -15,7 +15,7 @@ namespace SA.EntityFramework.EntityFramework.Repository
 
         public RecordsRepository(
             SaDbContext context,
-            IHostingEnvironment hostingEnvironment) : base(context)
+            IHostingEnvironment hostingEnvironment, IMapper mapper) : base(context, mapper)
         {
             _hostingEnvironment = hostingEnvironment;
         }
@@ -89,7 +89,7 @@ namespace SA.EntityFramework.EntityFramework.Repository
                     }
                 }
 
-                Mapper.Map(item, itemToUpdate);
+                _mapper.Map(item, itemToUpdate);                
 
                 if (filesForDelete.Any())
                 {

@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using System;
+using Microsoft.Extensions.Hosting;
 
 namespace SA.Web
 {
@@ -9,23 +8,30 @@ namespace SA.Web
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Run();
+            CreateHostBuilder(args)
+                .Build()
+                .Run();
         }
 
-        public static IWebHost CreateWebHostBuilder(string[] args)
+        public static IHostBuilder CreateHostBuilder(string[] args)
         {
             var config = new ConfigurationBuilder()
                 .AddCommandLine(args)
                 .Build();
 
-            return WebHost.CreateDefaultBuilder(args)
-                  .UseConfiguration(config)
-                  .UseKestrel()
-                  .UseWebRoot("wwwroot")
-                  .UseUrls("http://*:5000")
-                  .UseIISIntegration()
-                  .UseStartup<Startup>()
-                  .Build();
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseConfiguration(config)
+                        .ConfigureKestrel(options =>
+                        {
+                            options.ListenAnyIP(5001);
+                        })                        
+                        .UseWebRoot("wwwroot")
+                        .UseUrls("http://*:5000", "https://*5001")
+                        .UseIISIntegration()
+                        .UseStartup<Startup>();
+                });
         }
     }
 }

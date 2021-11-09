@@ -11,6 +11,7 @@ namespace SA.Core.Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public virtual T Id { get; set; }
         
-        public virtual DateTime? Created { get; set; }
+        [Required]
+        public virtual DateTime Created { get; set; }
     }
 }

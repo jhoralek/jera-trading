@@ -6,8 +6,6 @@ namespace SA.Application.Account
     {
         public virtual int Id { get; set; }
 
-        public virtual DateTime? Created { get; set; }
-
         public virtual string UserName { get; set; }
 
         public virtual string Password { get; set; }
@@ -23,5 +21,6 @@ namespace SA.Application.Account
         public virtual string Language { get; set; }
 
         public virtual int CustomerId { get; set; }
+        public virtual DateTime Created { get; set; }
     }
 }

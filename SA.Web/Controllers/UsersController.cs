@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +8,9 @@ using SA.Application.Records;
 using SA.Application.Security;
 using SA.Core.Model;
 using SA.EntityFramework.EntityFramework.Repository;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SA.WebApi.Controllers
 {
@@ -30,8 +31,9 @@ namespace SA.WebApi.Controllers
             IEntityRepository<Record> recordRepository,
             IEntityRepository<UserActivation> userActivationRepository,
             IUserEmailFactory userEmailFactory,
-            IConfiguration configuration)
-            : base(repository)
+            IConfiguration configuration,
+            IMapper mapper)
+            : base(repository, mapper)
         {
             _securityService = securityService;
             _customerRepository = customerRepository;
@@ -62,8 +64,7 @@ namespace SA.WebApi.Controllers
             {
                 var token = Guid.NewGuid().ToString();
                 var activation = await _userActivationRepository.AddAsync(new UserActivation
-                {
-                    Created = DateTime.Now,
+                {                    
                     IsUsed = false,
                     UserId = newUser.Id,
                     Token = token,
@@ -83,7 +84,7 @@ namespace SA.WebApi.Controllers
         [Route("getAllUsersForAdmin")]
         public async Task<IActionResult> GetAllUsersForAdmin()
             => Json(await _repository
-                .GetAllAsync<UserSimpleDto, DateTime?>(orderDesc: u => u.Created));
+                .GetAllAsync<UserSimpleDto, DateTime>(orderDesc: u => u.Created));
 
         [HttpGet("{userId}")]
         [Authorize("read:messages")]
@@ -150,8 +151,7 @@ namespace SA.WebApi.Controllers
 
             var token = Guid.NewGuid().ToString();
             var activation = await _userActivationRepository.AddAsync(new UserActivation
-            {
-                Created = DateTime.Now,
+            {                
                 IsUsed = false,
                 UserId = user.Id,
                 Token = token,

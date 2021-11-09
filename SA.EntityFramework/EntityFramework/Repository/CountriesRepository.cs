@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SA.Core.Model;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ namespace SA.EntityFramework.EntityFramework.Repository
 {
     public class CountriesRepository : BaseRepository<Country>, IEntityRepository<Country>
     {
-        public CountriesRepository(SaDbContext context) : base(context)
+        public CountriesRepository(SaDbContext context, IMapper mapper) : base(context, mapper)
         { }
 
         // TODO: find out why this is here
