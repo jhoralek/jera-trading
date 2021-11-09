@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SA.Core.Model;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,8 +9,8 @@ namespace SA.EntityFramework.EntityFramework.Repository
     public class UsersRepository : BaseRepository<User>, IEntityRepository<User>
     {
         
-        public UsersRepository(SaDbContext context) : base(context)
-        {}      
+        public UsersRepository(SaDbContext context, IMapper mapper) : base(context, mapper)
+        { }      
 
         // TODO: find out what is setting up and what not
         public override async Task<User> UpdateAsync(User item)

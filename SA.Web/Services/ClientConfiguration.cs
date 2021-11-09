@@ -6,15 +6,15 @@ namespace SA.Web.Services
 {
     public class ClientConfiguration
     {
-        IHostingEnvironment _env;
-        IConfiguration _conf;
+        private readonly IWebHostEnvironment _env;
+        private readonly IConfiguration _conf;
         DateTime _lastTime;
         long _lastTicks;
-        public ClientConfiguration(IHostingEnvironment env, IConfiguration conf)
+        public ClientConfiguration(IWebHostEnvironment env, IConfiguration conf)
         {
             _env = env;
             _conf = conf;
-            _lastTime = default(DateTime);
+            _lastTime = default;
             _lastTicks = 0;
         }
         public string Environment => _env.EnvironmentName;

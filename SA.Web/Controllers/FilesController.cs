@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using SA.EntityFramework.EntityFramework.Repository;
@@ -14,18 +15,19 @@ namespace SA.WebApi.Controllers
     [Route("api/Files")]
     public class FilesController : BaseController<Core.Model.File>
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
         public FilesController(
             IEntityRepository<Core.Model.File> repository,
-            IHostingEnvironment hostingEnvironment)
-            : base(repository)
+            IWebHostEnvironment hostingEnvironment,
+            IMapper mapper)
+            : base(repository, mapper)
         {
             _hostingEnvironment = hostingEnvironment;
         }
 
         [Authorize("admin")]
-        [HttpPost, DisableRequestSizeLimit]        
+        [HttpPost, DisableRequestSizeLimit]
         [Route("uploadFiles")]
         public ActionResult UploadFiles()
         {
@@ -43,7 +45,7 @@ namespace SA.WebApi.Controllers
 
                 if (fileData.Any())
                 {
-                    foreach(var file in fileData)
+                    foreach (var file in fileData)
                     {
                         string fName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
 
@@ -56,12 +58,13 @@ namespace SA.WebApi.Controllers
                                 Created = DateTime.Now,
                                 Name = fName,
                             });
-                        }                       
+                        }
                     }
                 }
                 return Json(fileList);
-                
-            } catch(Exception e)
+
+            }
+            catch (Exception e)
             {
                 return Json(new
                 {
@@ -77,7 +80,7 @@ namespace SA.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> InsertFiles([FromBody] List<Core.Model.File> files)
         {
-            foreach(var file in files)
+            foreach (var file in files)
             {
                 await _repository.AddAsync(file);
             }

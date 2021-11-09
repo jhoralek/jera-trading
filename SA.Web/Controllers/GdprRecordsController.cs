@@ -1,10 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SA.Application.Records;
 using SA.Core.Model;
 using SA.EntityFramework.EntityFramework.Repository;
+using System;
+using System.Threading.Tasks;
 
 namespace SA.WebApi.Controllers
 {
@@ -12,8 +13,8 @@ namespace SA.WebApi.Controllers
     public class GdprRecordsController : BaseController<GdprRecord>
     {
         public GdprRecordsController(
-            IEntityRepository<GdprRecord> repository)
-            : base(repository) {}
+            IEntityRepository<GdprRecord> repository, IMapper mapper)
+            : base(repository, mapper) { }
 
         [HttpPost]
         [Route("create")]

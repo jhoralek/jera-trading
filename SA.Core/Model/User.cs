@@ -1,25 +1,17 @@
-﻿using MySql.Data.EntityFrameworkCore.DataAnnotations;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace SA.Core.Model
 {
-    [MySqlCharset("utf8")]
-    [MySqlCollation("utf8_general_ci")]
     public class User : Entity<int>
     {
         [Required]
         [MinLength(6)]
-        [MySqlCharset("utf8")]
-        [MySqlCollation("utf8_general_ci")]
         public virtual string UserName { get; set; }
 
         [Required]
         [MinLength(8)]
-        [MySqlCharset("utf8")]
-        [MySqlCollation("utf8_general_ci")]
         public virtual string Password { get; set; }
 
         [Required]
@@ -34,14 +26,10 @@ namespace SA.Core.Model
         [DefaultValue(false)]
         public virtual bool SendingNews { get; set; }
 
-        [MySqlCharset("utf8")]
-        [MySqlCollation("utf8_general_ci")]
         public virtual string Token { get; set; }
 
         [Required]
         [MaxLength(2)]
-        [MySqlCharset("utf8")]
-        [MySqlCollation("utf8_general_ci")]
         public virtual string Language { get; set; }
 
         [Required]

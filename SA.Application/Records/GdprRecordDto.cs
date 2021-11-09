@@ -1,4 +1,5 @@
 ﻿using SA.Core.Enums;
+using System;
 
 namespace SA.Application.Records
 {
@@ -19,5 +20,6 @@ namespace SA.Application.Records
         public virtual string Description { get; set; }
         public virtual GdprApplicationType Type { get; set; }
         public virtual bool IsProcessed { get; set; }
+        public virtual DateTime Created { get; set; }
     }
 }

@@ -17,11 +17,8 @@
         "circular-json": "0.5.4",
         "crypto-js": "3.1.9-1",
         "currency-formatter": "1.4.3",
-        "eslint": "3.2.1",
         "material-design-icons-iconfont": "^3.0.3",
-        "moment-timezone": "0.5.31",
         "register-service-worker": "^1.4.1",
-        "typescript": "3.1.7",
         "vee-validate": "^2.1.0-beta.7",
         "vue": "^2.5.16",
         "vue-axios": "^2.1.1",
@@ -29,6 +26,7 @@
         "vue-cookieconsent-component": "^1.2.0",
         "vue-lory": "0.0.5",
         "vue-moment": "4.1.0",
+        "moment-timezone": "0.5.31",
         "vue-property-decorator": "^6.0.0",
         "vue-resource": "^1.5.1",
         "vue-router": "^3.0.1",
@@ -36,7 +34,8 @@
         "vuetify": "^1.1.10",
         "vuex": "3.0.1",
         "vuex-class": "^0.3.1",
-        "vuex-persist": "1.4.0"
+        "vuex-persist": "1.4.0",
+        "typescript": "3.9.10"
     },
     "devDependencies": {
         "@types/chai": "^4.1.0",
@@ -44,7 +43,7 @@
         "@vue/cli-plugin-babel": "^3.0.0-beta.15",
         "@vue/cli-plugin-e2e-cypress": "^3.0.0-beta.15",
         "@vue/cli-plugin-pwa": "3.0.0-beta.15",
-        "@vue/cli-plugin-typescript": "^3.0.0-beta.15",
+        "@vue/cli-plugin-typescript": "^3.12.1",
         "@vue/cli-plugin-unit-mocha": "^3.0.0-beta.15",
         "@vue/cli-service": "^3.0.0-beta.15",
         "@vue/test-utils": "^1.0.0-beta.16",

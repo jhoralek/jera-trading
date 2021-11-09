@@ -5,9 +5,7 @@ namespace SA.Application.Account
     public class UserSimpleDto
     {
         public virtual int Id { get; set; }
-
-        public virtual DateTime? Created { get; set; }
-
+        public virtual DateTime Created { get; set; }
         public virtual string UserName { get; set; }
 
         public virtual bool IsActive { get; set; }

@@ -43,7 +43,7 @@ const actions: ActionTree<RecordState, RootState> = {
             return resolve(true);
         });
     },
-    initialCurrent({commit}): Promise<boolean> {
+    initialCurrent({ commit }): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             commit(RECORD_INITIAL_CURRENT);
             return resolve(true);
@@ -52,8 +52,8 @@ const actions: ActionTree<RecordState, RootState> = {
     /**
      * Load all active records
      */
-    loadAllPublished({commit, rootState, dispatch}): Promise<boolean> {
-        return new Promise<boolean> ((resolve) => {
+    loadAllPublished({ commit, rootState, dispatch }): Promise<boolean> {
+        return new Promise<boolean>((resolve) => {
             return axios.get(
                 `${rootState.settings.apiUrl}/records/getAllCurrentAuctionItems`)
                 .then((response) => {
@@ -63,7 +63,7 @@ const actions: ActionTree<RecordState, RootState> = {
                         dispatch('auction/getFutureAutions', {
                             mod: 'Auction',
                         },
-                        { root: true });
+                            { root: true });
                     }
                     return resolve(true);
                 })
@@ -75,13 +75,13 @@ const actions: ActionTree<RecordState, RootState> = {
                             message: error.message,
                         },
                     },
-                    { root: true});
+                        { root: true });
                     return resolve(false);
                 });
         });
     },
-    loadUpdateAllPublished({commit, rootState, dispatch}): Promise<boolean> {
-        return new Promise<boolean> ((resolve) => {
+    loadUpdateAllPublished({ commit, rootState, dispatch }): Promise<boolean> {
+        return new Promise<boolean>((resolve) => {
             return axios.get(
                 `${rootState.settings.apiUrl}/records/getAllCurrentAuctionItemsMinimum`)
                 .then((response) => {
@@ -97,7 +97,7 @@ const actions: ActionTree<RecordState, RootState> = {
                             message: error.message,
                         },
                     },
-                    { root: true});
+                        { root: true });
                     return resolve(false);
                 });
         });
@@ -113,7 +113,7 @@ const actions: ActionTree<RecordState, RootState> = {
                     const r: Record = response.data as Record;
 
                     commit(RECORD_CHANGE_CURRENT_STATE, r);
-                    dispatch('record/getRecordsLastBid', id, { root: true});
+                    dispatch('record/getRecordsLastBid', id, { root: true });
 
                     return resolve(true);
                 })
@@ -125,7 +125,7 @@ const actions: ActionTree<RecordState, RootState> = {
                             message: error.message,
                         },
                     },
-                    { root: true});
+                        { root: true });
                     return resolve(false);
                 });
         });
@@ -146,7 +146,7 @@ const actions: ActionTree<RecordState, RootState> = {
                             message: error.message,
                         },
                     },
-                    { root: true});
+                        { root: true });
                     return resolve(false);
                 });
         });
@@ -166,7 +166,7 @@ const actions: ActionTree<RecordState, RootState> = {
                             message: error.message,
                         },
                     },
-                    { root: true});
+                        { root: true });
                     return resolve(false);
                 });
         });
@@ -176,7 +176,7 @@ const actions: ActionTree<RecordState, RootState> = {
      * @param param0 Commit, root and dispatch object to manipulate and call other actions
      * @param id User id
      */
-    getAllActiveWithUsersBids({commit, rootState, dispatch}, id: number): Promise<boolean> {
+    getAllActiveWithUsersBids({ commit, rootState, dispatch }, id: number): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             return axios.get(
                 `${rootState.settings.apiUrl}/records/allActiveWithUsersBids?id=${id}`,
@@ -194,7 +194,7 @@ const actions: ActionTree<RecordState, RootState> = {
                             message: error.message,
                         },
                     },
-                    { root: true});
+                        { root: true });
                 });
         });
     },
@@ -203,10 +203,10 @@ const actions: ActionTree<RecordState, RootState> = {
      * @param param0 States
      * @param id idRecord
      */
-    getActualPrice({rootState, dispatch}, id: number): Promise<number> {
+    getActualPrice({ rootState, dispatch }, id: number): Promise<number> {
         return new Promise<number>((resolve) => {
             return axios.get(`${rootState.settings.apiUrl}/bids/getActualPrice?id=${id}`,
-            { headers: { authorization: rootState.auth.token } })
+                { headers: { authorization: rootState.auth.token } })
                 .then((response) => {
                     return resolve(response.data as number);
                 })
@@ -218,114 +218,114 @@ const actions: ActionTree<RecordState, RootState> = {
                             message: error.message,
                         },
                     },
-                    { root: true});
+                        { root: true });
                 });
         });
     },
-    getAllForAdmin({commit, rootState, dispatch}): Promise<boolean> {
+    getAllForAdmin({ commit, rootState, dispatch }): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             return axios.get(`${rootState.settings.apiUrl}/records/getAllForAdmin`,
                 { headers: { authorization: rootState.auth.token } })
-            .then((response) => {
-                commit(RECORD_CHANGE_LIST_STATE, response.data as RecordTableDto[]);
-                return resolve(true);
-            })
-            .catch((error) => {
-                dispatch('message/change', {
-                    mod: 'Record',
-                    message: {
-                        state: MessageStatusEnum.Error,
-                        message: error.message,
+                .then((response) => {
+                    commit(RECORD_CHANGE_LIST_STATE, response.data as RecordTableDto[]);
+                    return resolve(true);
+                })
+                .catch((error) => {
+                    dispatch('message/change', {
+                        mod: 'Record',
+                        message: {
+                            state: MessageStatusEnum.Error,
+                            message: error.message,
+                        },
                     },
-                },
-                { root: true});
-            });
+                        { root: true });
+                });
         });
     },
-    getAuctionRecordsForAdmin({commit, rootState, dispatch}, auctionId: number): Promise<boolean> {
+    getAuctionRecordsForAdmin({ commit, rootState, dispatch }, auctionId: number): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             return axios.get(`${rootState.settings.apiUrl}/records/getAuctionRecordsForAdmin?id=${auctionId}`,
-                { headers: { authorization: rootState.auth.token} })
-            .then((response) => {
-                commit(RECORD_CHANGE_LIST_STATE, response.data as RecordTableDto[]);
-                return resolve(true);
-            })
-            .catch((error) => {
-                dispatch('message/change', {
-                    mod: 'Record',
-                    message: {
-                        state: MessageStatusEnum.Error,
-                        message: error.message,
+                { headers: { authorization: rootState.auth.token } })
+                .then((response) => {
+                    commit(RECORD_CHANGE_LIST_STATE, response.data as RecordTableDto[]);
+                    return resolve(true);
+                })
+                .catch((error) => {
+                    dispatch('message/change', {
+                        mod: 'Record',
+                        message: {
+                            state: MessageStatusEnum.Error,
+                            message: error.message,
+                        },
                     },
-                },
-                { root: true });
-            });
+                        { root: true });
+                });
         });
     },
-    createRecord({commit, rootState, dispatch}, r: Record): Promise<boolean> {
+    createRecord({ commit, rootState, dispatch }, r: Record): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             return axios.post(`${rootState.settings.apiUrl}/records/create`, r,
                 { headers: { authorization: rootState.auth.token } })
-            .then((response) => {
-                commit(RECORD_CHANGE_CURRENT_STATE, response.data as Record);
-                dispatch('message/change', {
-                    mod: 'Record',
-                    message: {
-                        state: MessageStatusEnum.Success,
-                        message: 'createdSuccessfully',
+                .then((response) => {
+                    commit(RECORD_CHANGE_CURRENT_STATE, response.data as Record);
+                    dispatch('message/change', {
+                        mod: 'Record',
+                        message: {
+                            state: MessageStatusEnum.Success,
+                            message: 'createdSuccessfully',
+                        },
                     },
-                },
-                { root: true });
-                dispatch('record/getAuctionRecordsForAdmin', r.auctionId, { root: true });
-                dispatch('record/initialCurrent', {}, { root: true });
-                return resolve(true);
-            })
-            .catch((error) => {
-                dispatch('message/change', {
-                    mod: 'Record',
-                    message: {
-                        state: MessageStatusEnum.Error,
-                        message: error.message,
+                        { root: true });
+                    dispatch('record/getAuctionRecordsForAdmin', r.auctionId, { root: true });
+                    dispatch('record/initialCurrent', {}, { root: true });
+                    return resolve(true);
+                })
+                .catch((error) => {
+                    dispatch('message/change', {
+                        mod: 'Record',
+                        message: {
+                            state: MessageStatusEnum.Error,
+                            message: error.message,
+                        },
                     },
-                },
-                { root: true});
-                return resolve(false);
-            });
+                        { root: true });
+                    return resolve(false);
+                });
         });
     },
-    uploadFiles({commit, rootState, dispatch}, formData: any): Promise<File[]> {
+    uploadFiles({ commit, rootState, dispatch }, formData: any): Promise<File[]> {
         return new Promise<File[]>((resolve) => {
             return axios.post(`${rootState.settings.apiUrl}/files/uploadFiles`, formData,
                 { headers: { authorization: rootState.auth.token } })
-            .then((response) => {
-                return resolve(response.data as File[]);
-            })
-            .catch((error) => {
-                dispatch('message/change', {
-                    mod: 'Record',
-                    message: {
-                        state: MessageStatusEnum.Error,
-                        message: error.message,
+                .then((response) => {
+                    return resolve(response.data as File[]);
+                })
+                .catch((error) => {
+                    dispatch('message/change', {
+                        mod: 'Record',
+                        message: {
+                            state: MessageStatusEnum.Error,
+                            message: error.message,
+                        },
                     },
-                },
-                { root: true});
-                return resolve(undefined);
-            });
+                        { root: true });
+                    return resolve(undefined);
+                });
         });
     },
-    setCurrent({commit}, r: Record): Promise<boolean> {
+    setCurrent({ commit }, r: Record): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             commit(RECORD_CHANGE_CURRENT_STATE, r);
             return resolve(true);
         });
     },
-    setCurrentUserId({commit}, userId: number): Promise<boolean> {
+    setCurrentUserId({ commit }, userId: number): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             commit(RECORD_SET_CURRENT_USER_ID, userId);
             return resolve(true);
         });
     },
-    setCurrentRecordDatesFromAuction({commit}, auction: Auction): Promise<boolean> {
+    setCurrentRecordDatesFromAuction({ commit }, auction: Auction): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             const { validFrom, validTo } = auction;
 
@@ -333,7 +333,7 @@ const actions: ActionTree<RecordState, RootState> = {
             return resolve(true);
         });
     },
-    setCurrentRecordDates({commit}, r: Record): Promise<boolean> {
+    setCurrentRecordDates({ commit }, r: Record): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             const { validFrom, validTo } = r;
 
@@ -341,56 +341,56 @@ const actions: ActionTree<RecordState, RootState> = {
             return resolve(true);
         });
     },
-    setCurrentAuctionId({commit}, auctionId: number): Promise<boolean> {
+    setCurrentAuctionId({ commit }, auctionId: number): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             commit(RECORD_SET_CURRENT_AUCTION_ID, auctionId);
             return resolve(true);
         });
     },
-    setFiles({commit}, files: FileSimpleDto[]): Promise<boolean> {
+    setFiles({ commit }, files: FileSimpleDto[]): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             commit(RECORD_SET_CURRENT_FILES, files);
             return resolve(true);
         });
     },
-    addFiles({commit}, files: FileSimpleDto[]): Promise<boolean> {
+    addFiles({ commit }, files: FileSimpleDto[]): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
-            commit (RECORD_APPEND_CURRENT_FILES, files);
+            commit(RECORD_APPEND_CURRENT_FILES, files);
             return resolve(true);
         });
     },
-    updateRecord({rootState, dispatch}, r: Record): Promise<boolean> {
-        return new Promise<boolean> ((resolve) => {
+    updateRecord({ rootState, dispatch }, r: Record): Promise<boolean> {
+        return new Promise<boolean>((resolve) => {
             return axios.put(`${rootState.settings.apiUrl}/records`, r,
                 { headers: { authorization: rootState.auth.token } })
-            .then((response) => {
-                dispatch('message/change', {
-                    mod: 'Record',
-                    message: {
-                        state: MessageStatusEnum.Success,
-                        message: 'updatedSuccessfully',
+                .then((response) => {
+                    dispatch('message/change', {
+                        mod: 'Record',
+                        message: {
+                            state: MessageStatusEnum.Success,
+                            message: 'updatedSuccessfully',
+                        },
                     },
-                },
-                { root: true });
-                dispatch('record/getAllForAdmin', {}, { root: true });
-                dispatch('record/initialCurrent', {}, { root: true });
-                return resolve(true);
-            })
-            .catch((error) => {
-                dispatch('message/change', {
-                    mod: 'Record',
-                    message: {
-                        state: MessageStatusEnum.Error,
-                        message: error.message,
+                        { root: true });
+                    dispatch('record/getAllForAdmin', {}, { root: true });
+                    dispatch('record/initialCurrent', {}, { root: true });
+                    return resolve(true);
+                })
+                .catch((error) => {
+                    dispatch('message/change', {
+                        mod: 'Record',
+                        message: {
+                            state: MessageStatusEnum.Error,
+                            message: error.message,
+                        },
                     },
-                },
-                { root: true});
-                return resolve(undefined);
-            });
+                        { root: true });
+                    return resolve(undefined);
+                });
         });
     },
-    deleteRecord({commit, rootState, dispatch}, recordId: number): Promise<boolean> {
-        return new Promise<boolean> ((resolve) => {
+    deleteRecord({ commit, rootState, dispatch }, recordId: number): Promise<boolean> {
+        return new Promise<boolean>((resolve) => {
             return axios.delete(`${rootState.settings.apiUrl}/records/delete`,
                 {
                     params: {
@@ -400,197 +400,197 @@ const actions: ActionTree<RecordState, RootState> = {
                         authorization: rootState.auth.token,
                     },
                 })
-            .then((response) => {
-                commit(RECORD_DELETE_RECORD_FROM_LIST, response.data as Record);
-                commit(RECORD_INITIAL_CURRENT);
-                dispatch('message/change', {
-                    mod: 'Record',
-                    message: {
-                        state: MessageStatusEnum.Success,
-                        message: 'deleteSuccessfully',
-                    },
-                },
-                { root: true });
-                return resolve(true);
-            })
-            .catch((error) => {
-                dispatch('message/change', {
-                    mod: 'Record',
-                    message: {
-                        state: MessageStatusEnum.Error,
-                        message: error.message,
-                    },
-                },
-                { root: true});
-                return resolve(false);
-            });
-        });
-    },
-    addBid({rootState, dispatch}, bid: Bid): Promise<boolean> {
-        return new Promise<boolean>((resolve) => {
-            return axios.post(`${rootState.settings.apiUrl}/bids/create`, bid,
-                { headers: { authorization: rootState.auth.token }})
-            .then((resp1) => {
-                const response = resp1.data as ResponseMessage<Bid>;
-                if (response.code === 'createdSuccessfully') {
-                    dispatch('record/sendEmailToOverbideduser', bid.recordId, { root: true});
-                }
-
-                dispatch('record/getDetail', bid.recordId, { root: true}).then((resp2) => {
+                .then((response) => {
+                    commit(RECORD_DELETE_RECORD_FROM_LIST, response.data as Record);
+                    commit(RECORD_INITIAL_CURRENT);
                     dispatch('message/change', {
                         mod: 'Record',
                         message: {
-                            state: response.status,
-                            message: response.code,
+                            state: MessageStatusEnum.Success,
+                            message: 'deleteSuccessfully',
                         },
                     },
-                    { root: true});
+                        { root: true });
                     return resolve(true);
-                });
-
-            })
-            .catch((error) => {
-                dispatch('message/change', {
-                    mod: 'Record',
-                    message: {
-                        state: MessageStatusEnum.Error,
-                        message: error.message,
+                })
+                .catch((error) => {
+                    dispatch('message/change', {
+                        mod: 'Record',
+                        message: {
+                            state: MessageStatusEnum.Error,
+                            message: error.message,
+                        },
                     },
-                },
-                { root: true});
-                return resolve(false);
-            });
+                        { root: true });
+                    return resolve(false);
+                });
         });
     },
-    sendEmailToOverbideduser({rootState}, recordId: number): Promise<boolean> {
+    addBid({ rootState, dispatch }, bid: Bid): Promise<boolean> {
+        return new Promise<boolean>((resolve) => {
+            return axios.post(`${rootState.settings.apiUrl}/bids/create`, bid,
+                { headers: { authorization: rootState.auth.token } })
+                .then((resp1) => {
+                    const response = resp1.data as ResponseMessage<Bid>;
+                    // if (response.code === 'createdSuccessfully') {
+                    //    dispatch('record/sendEmailToOverbideduser', bid.recordId, { root: true});
+                    // }
+
+                    dispatch('record/getDetail', bid.recordId, { root: true }).then((resp2) => {
+                        dispatch('message/change', {
+                            mod: 'Record',
+                            message: {
+                                state: response.status,
+                                message: response.code,
+                            },
+                        },
+                            { root: true });
+                        return resolve(true);
+                    });
+
+                })
+                .catch((error) => {
+                    dispatch('message/change', {
+                        mod: 'Record',
+                        message: {
+                            state: MessageStatusEnum.Error,
+                            message: error.message,
+                        },
+                    },
+                        { root: true });
+                    return resolve(false);
+                });
+        });
+    },
+    sendEmailToOverbideduser({ rootState }, recordId: number): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             return axios.get(`${rootState.settings.apiUrl}/bids/sendEmailToOverbided?recordId=${recordId}`,
                 { headers: { authorization: rootState.auth.token } })
-            .then(() => {
-                return resolve(true);
-            })
-            .catch(() => {
-                return resolve(false);
-            });
+                .then(() => {
+                    return resolve(true);
+                })
+                .catch(() => {
+                    return resolve(false);
+                });
         });
     },
-    getAllEndedRecords({commit, rootState, dispatch}): Promise<boolean> {
+    getAllEndedRecords({ commit, rootState, dispatch }): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             return axios.get(`${rootState.settings.apiUrl}/records/getAllEndedRecords`,
                 { headers: { authorization: rootState.auth.token } })
-            .then((response) => {
-                commit(RECORD_CHANGE_LIST_STATE, response.data as RecordTableDto[]);
-                return resolve(true);
-            })
-            .catch((error) => {
-                dispatch('message/change', {
-                    mod: 'Record',
-                    message: {
-                        state: MessageStatusEnum.Error,
-                        message: error.message,
+                .then((response) => {
+                    commit(RECORD_CHANGE_LIST_STATE, response.data as RecordTableDto[]);
+                    return resolve(true);
+                })
+                .catch((error) => {
+                    dispatch('message/change', {
+                        mod: 'Record',
+                        message: {
+                            state: MessageStatusEnum.Error,
+                            message: error.message,
+                        },
                     },
-                },
-                { root: true});
-                return resolve(false);
-            });
+                        { root: true });
+                    return resolve(false);
+                });
         });
     },
-    getLatestEndedRecords({commit, rootState, dispatch}, take: number): Promise<boolean> {
+    getLatestEndedRecords({ commit, rootState, dispatch }, take: number): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             return axios.get(`${rootState.settings.apiUrl}/records/getLatestEndedRecords?take=${take}`)
-            .then((response) => {
-                commit(RECORD_CHANGE_LIST_STATE, response.data as RecordTableDto[]);
-                return resolve(true);
-            })
-            .catch((error) => {
-                dispatch('message/change', {
-                    mod: 'Record',
-                    message: {
-                        state: MessageStatusEnum.Error,
-                        message: error.message,
+                .then((response) => {
+                    commit(RECORD_CHANGE_LIST_STATE, response.data as RecordTableDto[]);
+                    return resolve(true);
+                })
+                .catch((error) => {
+                    dispatch('message/change', {
+                        mod: 'Record',
+                        message: {
+                            state: MessageStatusEnum.Error,
+                            message: error.message,
+                        },
                     },
-                },
-                { root: true});
-                return resolve(false);
-            });
+                        { root: true });
+                    return resolve(false);
+                });
         });
     },
-    updateRecordDatesByAuctionId({commit, rootState, dispatch}, auctionId: number): Promise<boolean> {
+    updateRecordDatesByAuctionId({ commit, rootState, dispatch }, auctionId: number): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             return axios.get(`${rootState.settings.apiUrl}/records/updateRecordDatesByAuctionId?id=${auctionId}`,
                 { headers: { authorization: rootState.auth.token } })
-            .then((resp1) => {
-                commit(RECORD_CHANGE_LIST_STATE, resp1.data as RecordTableDto[]);
-                dispatch('message/change', {
-                    mod: 'Record',
-                    message: {
-                        state: MessageStatusEnum.Success,
-                        message: 'itemsUpdatedSuccessfully',
+                .then((resp1) => {
+                    commit(RECORD_CHANGE_LIST_STATE, resp1.data as RecordTableDto[]);
+                    dispatch('message/change', {
+                        mod: 'Record',
+                        message: {
+                            state: MessageStatusEnum.Success,
+                            message: 'itemsUpdatedSuccessfully',
+                        },
                     },
-                },
-                { root: true });
-                return resolve(true);
-            })
-            .catch((error) => {
-                dispatch('message/change', {
-                    mod: 'Record',
-                    message: {
-                        state: MessageStatusEnum.Error,
-                        message: error.message,
+                        { root: true });
+                    return resolve(true);
+                })
+                .catch((error) => {
+                    dispatch('message/change', {
+                        mod: 'Record',
+                        message: {
+                            state: MessageStatusEnum.Error,
+                            message: error.message,
+                        },
                     },
-                },
-                { root: true});
-                return resolve(false);
-            });
+                        { root: true });
+                    return resolve(false);
+                });
         });
     },
-    getRecordsBidForAdmin({commit, rootState, dispatch}, recordId: number): Promise<boolean> {
+    getRecordsBidForAdmin({ commit, rootState, dispatch }, recordId: number): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             return axios.get(`${rootState.settings.apiUrl}/bids/getRecordsBidForAdmin?id=${recordId}`,
                 { headers: { authorization: rootState.auth.token } })
-            .then((resp1) => {
-                return axios.get(`${rootState.settings.apiUrl}/records/getById?id=${recordId}`)
-                    .then((resp2) => {
-                        commit(RECORD_CHANGE_CURRENT_STATE, resp2.data as RecordTableDto);
-                        commit(RECORD_CHANGE_BIDS_TO_CURRENT, resp1.data as BidDto[]);
-                        return resolve(true);
-                    });
-            })
-            .catch((error) => {
-                dispatch('message/change', {
-                    mod: 'Record',
-                    message: {
-                        state: MessageStatusEnum.Error,
-                        message: error.message,
+                .then((resp1) => {
+                    return axios.get(`${rootState.settings.apiUrl}/records/getById?id=${recordId}`)
+                        .then((resp2) => {
+                            commit(RECORD_CHANGE_CURRENT_STATE, resp2.data as RecordTableDto);
+                            commit(RECORD_CHANGE_BIDS_TO_CURRENT, resp1.data as BidDto[]);
+                            return resolve(true);
+                        });
+                })
+                .catch((error) => {
+                    dispatch('message/change', {
+                        mod: 'Record',
+                        message: {
+                            state: MessageStatusEnum.Error,
+                            message: error.message,
+                        },
                     },
-                },
-                { root: true});
-                return resolve(false);
-            });
+                        { root: true });
+                    return resolve(false);
+                });
         });
     },
-    getRecordsLastBid({commit, rootState, dispatch}, recordId: number): Promise<boolean> {
+    getRecordsLastBid({ commit, rootState, dispatch }, recordId: number): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             return axios.get(`${rootState.settings.apiUrl}/bids/getRecordsLastBid?id=${recordId}`)
-            .then((resp1) => {
-                const data = resp1.data as BidDto;
+                .then((resp1) => {
+                    const data = resp1.data as BidDto;
 
-                if (data !== null) {
-                    commit(RECORD_CHANGE_WINNING_USER_ID, data);
-                }
-                return resolve(true);
-            })
-            .catch((error) => {
-                dispatch('message/change', {
-                    mod: 'Record',
-                    message: {
-                        state: MessageStatusEnum.Error,
-                        message: error.message,
+                    if (data !== null) {
+                        commit(RECORD_CHANGE_WINNING_USER_ID, data);
+                    }
+                    return resolve(true);
+                })
+                .catch((error) => {
+                    dispatch('message/change', {
+                        mod: 'Record',
+                        message: {
+                            state: MessageStatusEnum.Error,
+                            message: error.message,
+                        },
                     },
-                },
-                { root: true});
-                return resolve(false);
-            });
+                        { root: true });
+                    return resolve(false);
+                });
         });
     },
 };

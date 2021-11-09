@@ -1,4 +1,5 @@
-﻿using SA.Core.Model;
+﻿using AutoMapper;
+using SA.Core.Model;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ namespace SA.EntityFramework.EntityFramework.Repository
 {
     public class UserActivationsRepository : BaseRepository<UserActivation>, IEntityRepository<UserActivation>
     {
-        public UserActivationsRepository(SaDbContext context) : base(context)
+        public UserActivationsRepository(SaDbContext context, IMapper mapper) : base(context, mapper)
         { }
 
         public override async Task<UserActivation> UpdateAsync(UserActivation item)

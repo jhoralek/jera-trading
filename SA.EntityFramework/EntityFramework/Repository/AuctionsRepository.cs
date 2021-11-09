@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using SA.Core.Model;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace SA.EntityFramework.EntityFramework.Repository
 
         public AuctionsRepository(
             SaDbContext context,
-            IHostingEnvironment hostingEnvironment) : base(context)
+            IHostingEnvironment hostingEnvironment, IMapper mapper) : base(context, mapper)
         {
             _hostingEnvironment = hostingEnvironment;
         }
