@@ -117,7 +117,8 @@ namespace SA.Web
             }
 
             app.UseCors((x) =>
-            {                
+            {
+                x.WithOrigins("https://www.jera-trading.cz", "https://jera-trading.cz", "https://www.jeratrading.cz", "https://jeratrading.cz", "http://localhost");
                 x.AllowCredentials();
                 x.AllowAnyHeader();
                 x.AllowAnyMethod();
