@@ -22,6 +22,10 @@ import {
     RECORD_CHANGE_BIDS_TO_CURRENT,
     RECORD_CHANGE_WINNING_USER_ID,
     RECORD_UPDATE_LIST_STATE,
+    RECORD_CHANGE_NUMBER_OF_BIDS_TO_CURRENT,
+    RECORD_CHANGE_CURRENT_PRICE_TO_START_PRICE,
+    RECORD_SET_CURRENT_PRICE,
+    RECORD_EXTEND_VALID_TO,
 } from '@/store/mutation-types';
 import {
     RecordTableDto,
@@ -59,12 +63,35 @@ const actions: ActionTree<RecordState, RootState> = {
                 .then((response) => {
                     const records: RecordTableDto[] = response.data as RecordTableDto[];
                     commit(RECORD_CHANGE_LIST_STATE, records);
-                    if (records.length === 0) {
-                        dispatch('auction/getFutureAutions', {
-                            mod: 'Auction',
-                        },
-                            { root: true });
-                    }
+
+                    response.data.forEach((item) => {
+                        axios.get(`${rootState.settings.apiUrl}/files/getFilesByRecordId?id=${item.id}`)
+                            .then((responseFiles) => {
+                                const r: FileSimpleDto[] = responseFiles.data as FileSimpleDto[];
+
+                                item.files = r;
+                                commit(RECORD_CHANGE_LIST_STATE, records);
+                            });
+
+                        return axios.get(`${rootState.settings.apiUrl}/bids/getBidsByRecordId?id=${item.id}`)
+                            .then((responseBids) => {
+                                const b: BidDto[] = responseBids.data as BidDto[];
+
+                                const bidIds = b.map((x) => x.userId);
+                                // add unique ids into the array
+                                item.biddingUserIds = [...new Set(bidIds)];
+                                item.winningUserId = bidIds.length > 0 ? bidIds[0] : 0;
+                                item.currentPrice = b.length === 0 ? item.startingPrice : b[0].price;
+
+                                commit(RECORD_CHANGE_LIST_STATE, records);
+                            });
+                    });
+
+                    dispatch('auction/getFutureAutions', {
+                        mod: 'Auction',
+                    },
+                        { root: true });
+
                     return resolve(true);
                 })
                 .catch((error) => {
@@ -130,6 +157,30 @@ const actions: ActionTree<RecordState, RootState> = {
                 });
         });
     },
+    getRecordFiles({ commit, rootState, dispatch }, id: number): Promise<FileSimpleDto[]> {
+        return new Promise<FileSimpleDto[]>((resolve) => {
+            return axios.get(`${rootState.settings.apiUrl}/files/getFilesByRecordId?id=${id}`)
+                .then((response) => {
+                    const r: FileSimpleDto[] = response.data as FileSimpleDto[];
+
+                    commit(RECORD_SET_CURRENT_FILES, r);
+
+                    return resolve(r);
+                })
+                .catch((error) => {
+                    dispatch('message/change', {
+                        mod: 'Record',
+                        message: {
+                            state: MessageStatusEnum.Error,
+                            message: error.message,
+                        },
+                    },
+                        { root: true });
+                    return resolve(null);
+                });
+        });
+    },
+
     getActualRandom({ commit, rootState, dispatch }): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             return axios.get(`${rootState.settings.apiUrl}/records/actualRandom`)
@@ -151,11 +202,13 @@ const actions: ActionTree<RecordState, RootState> = {
                 });
         });
     },
-    getBids({ commit, rootState, dispatch }, recordId: number): Promise<boolean> {
+    getBids({ commit, rootState, dispatch }, recordId: string): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
-            return axios.get(`${rootState.settings.apiUrl}/records/getBids?id=${recordId}`)
+            return axios.get(`${rootState.settings.apiUrl}/bids/getBidsByRecordId?id=${recordId}`)
                 .then((response) => {
                     commit(RECORD_CHANGE_BIDS_TO_CURRENT, response.data as BidDto[]);
+                    commit(RECORD_CHANGE_NUMBER_OF_BIDS_TO_CURRENT, response.data.length);
+
                     return resolve(true);
                 })
                 .catch((error) => {
@@ -426,28 +479,31 @@ const actions: ActionTree<RecordState, RootState> = {
                 });
         });
     },
-    addBid({ rootState, dispatch }, bid: Bid): Promise<boolean> {
-        return new Promise<boolean>((resolve) => {
+    addBid({ commit, rootState, dispatch }, bid: Bid): Promise<number> {
+        return new Promise<number>((resolve) => {
             return axios.post(`${rootState.settings.apiUrl}/bids/create`, bid,
                 { headers: { authorization: rootState.auth.token } })
                 .then((resp1) => {
-                    const response = resp1.data as ResponseMessage<Bid>;
-                    // if (response.code === 'createdSuccessfully') {
-                    //    dispatch('record/sendEmailToOverbideduser', bid.recordId, { root: true});
-                    // }
+                    const response = resp1.data as ResponseMessage<BidDto>;
 
-                    dispatch('record/getDetail', bid.recordId, { root: true }).then((resp2) => {
-                        dispatch('message/change', {
-                            mod: 'Record',
-                            message: {
-                                state: response.status,
-                                message: response.code,
-                            },
+                    commit(RECORD_SET_CURRENT_PRICE, response.entity.price);
+                    commit(RECORD_EXTEND_VALID_TO, response.entity.recordValidTo);
+
+                    dispatch('record/getBids', bid.recordId, { root: true });
+
+                    if (response.code === 'createdSuccessfully') {
+                        dispatch('record/sendEmailToOverbideduser', bid.recordId, { root: true });
+                    }
+
+                    dispatch('message/change', {
+                        mod: 'Record',
+                        message: {
+                            state: response.status,
+                            message: response.code,
                         },
-                            { root: true });
-                        return resolve(true);
-                    });
+                    }, { root: true });
 
+                    return resolve(response.entity.price);
                 })
                 .catch((error) => {
                     dispatch('message/change', {
@@ -458,7 +514,7 @@ const actions: ActionTree<RecordState, RootState> = {
                         },
                     },
                         { root: true });
-                    return resolve(false);
+                    return resolve(null);
                 });
         });
     },
@@ -569,7 +625,7 @@ const actions: ActionTree<RecordState, RootState> = {
                 });
         });
     },
-    getRecordsLastBid({ commit, rootState, dispatch }, recordId: number): Promise<boolean> {
+    getRecordsLastBid({ commit, rootState, dispatch }, recordId: string): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             return axios.get(`${rootState.settings.apiUrl}/bids/getRecordsLastBid?id=${recordId}`)
                 .then((resp1) => {
@@ -577,7 +633,10 @@ const actions: ActionTree<RecordState, RootState> = {
 
                     if (data !== null) {
                         commit(RECORD_CHANGE_WINNING_USER_ID, data);
+                    } else {
+                        commit(RECORD_CHANGE_CURRENT_PRICE_TO_START_PRICE);
                     }
+
                     return resolve(true);
                 })
                 .catch((error) => {

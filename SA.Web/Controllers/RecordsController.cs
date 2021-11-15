@@ -35,17 +35,37 @@ namespace SA.WebApi.Controllers
 
         [HttpGet]
         [Route("getAllCurrentAuctionItems")]
-        public async Task<IActionResult> GetAllCurrentAuctionItems()
+        public ActionResult GetAllCurrentAuctionItems()
         {
             var today = DateTime.Now;
-            var records = await _repository.GetAllAsync<RecordTableDto, DateTime>(x => x.IsActive
-                && x.Auction.IsActive
-                && x.Auction.ValidFrom <= today
-                && x.Auction.ValidTo >= today
-                && !x.Auction.IsEnded
-                && x.ValidFrom <= today
-                && x.ValidTo >= today,
-                x => x.ValidTo);
+
+            var records = _repository.Context.Records
+                .Join(_repository.Context.Auctions, r => r.AuctionId, a => a.Id,
+                    (r, a) => new { r, a })                
+                .Where(all => all.a.IsActive
+                    && all.r.ValidFrom <= today
+                    && all.r.ValidTo >= today
+                    && all.a.ValidFrom <= today
+                    && all.a.ValidTo >= today
+                    && !all.a.IsEnded)
+                .OrderBy(all => all.a.ValidFrom)
+                .AsEnumerable()
+                .Select(all => new RecordTableDto
+                {
+                    Id = all.r.Id,
+                    Name = all.r.Name,
+                    ValidFrom = all.r.ValidFrom,
+                    ValidTo = all.r.ValidTo,
+                    MinimumBid = all.r.MinimumBid,
+                    StartingPrice = all.r.StartingPrice,
+                    State = all.r.State,
+                    RegistrationYear = all.r.DateOfFirstRegistration.HasValue ? all.r.DateOfFirstRegistration.Value.Year : null,
+                    Fuel = all.r.Fuel,
+                    AuctionName = all.a.Name,
+                    AuctionId = all.a.Id,
+                    Mileage = all.r.Mileage,
+                    WithVat = all.r.WithVat                   
+                });
 
             return Json(records);
         }
@@ -70,19 +90,8 @@ namespace SA.WebApi.Controllers
         [Route("getById")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
-        {
-            var item = await _repository.GetOneAsync<RecordDetailDto>(x => x.Id == id);
+            => Json(await _repository.Context.Records.FirstOrDefaultAsync(r => r.Id == id));
 
-            if (item != null)
-            {
-                if (item.Bids.Any())
-                {
-                    item.Bids = item.Bids.OrderByDescending(x => x.Price).Take(3).ToList();
-                }
-            }
-
-            return Json(item);
-        }
         [Authorize("admin")]
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] Record record)

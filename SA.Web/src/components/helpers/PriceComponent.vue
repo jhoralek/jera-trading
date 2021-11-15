@@ -11,7 +11,7 @@ import Helpers from './../../helpers';
 const SettingsGetter = namespace('settings', Getter);
 
 @Component({})
-export default class CountdownComponent extends Vue {
+export default class PriceComponent extends Vue {
     @Prop({default: 0})
     private price: number;
 

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using SA.Application.Records;
 using SA.EntityFramework.EntityFramework.Repository;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,13 @@ namespace SA.WebApi.Controllers
         {
             _hostingEnvironment = hostingEnvironment;
         }
+
+
+        [Route("getFilesByRecordId")]
+        [HttpGet("{id}")]
+        public ActionResult GetFilesByRecordId(int id)
+            => Json(_mapper.ProjectTo<FileSimpleDto>(_repository.Context.Files.Where(f => f.RecordId == id)));
+
 
         [Authorize("admin")]
         [HttpPost, DisableRequestSizeLimit]
