@@ -62,7 +62,9 @@ const mutations: MutationTree<RecordState> = {
     },
     RECORD_SET_CURRENT_FILES(state, files: FileSimpleDto[]) {
         state.error = false;
-        state.current.files = files;
+        if (state.current !== undefined) {
+            state.current.files = files;
+        }
     },
     RECORD_APPEND_CURRENT_FILES(state, files: FileSimpleDto[]) {
         state.error = false;
@@ -80,7 +82,7 @@ const mutations: MutationTree<RecordState> = {
         state.error = false;
         state.current.bids = bids as BidDto[];
     },
-    RECORD_SET_VALID_DATES(state, dates: any)   {
+    RECORD_SET_VALID_DATES(state, dates: any) {
         const { validFrom, validTo } = dates;
 
         state.error = false;
@@ -90,6 +92,13 @@ const mutations: MutationTree<RecordState> = {
 
         state.current.validFrom = formatedFrom;
         state.current.validTo = formatedTo;
+    },
+    RECORD_CHANGE_NUMBER_OF_BIDS_TO_CURRENT(state, numberOfBids: number) {
+        state.error = false;
+
+        if (state.current !== undefined) {
+            state.current.numberOfBids = numberOfBids;
+        }
     },
     RECORD_CHANGE_WINNING_USER_ID(state, bid: BidDto) {
         const { userId, price, recordValidTo } = bid;
@@ -105,7 +114,14 @@ const mutations: MutationTree<RecordState> = {
 
         if (!isIn) {
             state.current.bids.unshift(bid);
-            state.current.numberOfBids ++;
+            state.current.numberOfBids++;
+        }
+    },
+    RECORD_CHANGE_CURRENT_PRICE_TO_START_PRICE(state) {
+        state.error = false;
+
+        if (state.current !== undefined) {
+            state.current.currentPrice = state.current.startingPrice;
         }
     },
     RECORD_UPDATE_LIST_STATE(state, records: RecordMinimumDto[]) {
@@ -120,6 +136,16 @@ const mutations: MutationTree<RecordState> = {
                 item.winningUserId = updItem.winningUserId;
             }
         });
+    },
+    RECORD_SET_CURRENT_PRICE(state, price: number) {
+        state.error = false;
+
+        state.current.currentPrice = price;
+    },
+    RECORD_EXTEND_VALID_TO(state, validTo: Date) {
+        state.error = false;
+
+        state.current.validTo = validTo;
     },
 };
 

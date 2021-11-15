@@ -64,12 +64,10 @@ namespace SA.Web
 
             var connectionString = _configuration["ConnectionString:CS"];
 
-            var serverVersion = new MySqlServerVersion(new Version(8, 0, 26));
+            var serverVersion = new MySqlServerVersion(new Version(8, 0, 27));
 
             services.AddDbContext<SaDbContext>(options => options
-                .UseMySql(connectionString, serverVersion)
-                .EnableSensitiveDataLogging()
-                .EnableDetailedErrors(),
+                .UseMySql(connectionString, serverVersion),
                 ServiceLifetime.Transient);
 
             services.AddControllersWithViews()

@@ -52,7 +52,7 @@ export default class CarouselItem extends BaseComponent {
   private item: CarouselItemDto;
 
   private detail(id: number): void {
-    this.$emit('detail', id);
+      this.$emit('detailCarousel', id);
   }
 }
 </script>

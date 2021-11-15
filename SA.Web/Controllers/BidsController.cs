@@ -48,6 +48,29 @@ namespace SA.WebApi.Controllers
             return Json(bids.Max(x => x.Price));
         }
 
+        [HttpGet("{id}")]
+        [Route("getBidsByRecordId")]
+        public ActionResult GetBidsByRecordId(int id)
+        {
+            var query = _repository.Context.Bids
+                .Join(_repository.Context.Users, b => b.UserId, u => u.Id, (b, u) => new { b, u })
+                .Join(_repository.Context.Records, bu => bu.b.RecordId, r => r.Id, (bu, r) => new { bu.b, bu.u, r })
+                .Where(b => b.b.RecordId == id)
+                .OrderByDescending(b => b.b.Price)
+                .Select(all => new BidSimpleDto
+                {
+                    Id = all.b.Id,
+                    Price = all.b.Price,
+                    RecordId = all.b.RecordId,
+                    Created = all.b.Created,
+                    UserId = all.b.UserId,
+                    UserName = all.u.UserName,
+                    RecordValidTo = all.r.ValidTo
+                });
+
+            return Json(query);
+        }
+
         [Authorize("admin")]
         [HttpGet("{id}")]
         [Route("getRecordsBidForAdmin")]
@@ -71,10 +94,17 @@ namespace SA.WebApi.Controllers
         [Route("create")]
         public async Task<IActionResult> Create([FromBody] Bid bid)
         {
-            var response = new ResponseMessage<Bid>
+            var response = new ResponseMessage<BidSimpleDto>
             {
                 Status = MessageStatusEnum.Error,
-                Entity = bid,
+                Entity = new BidSimpleDto
+                {
+                    Id = bid.Id,
+                    Price = bid.Price,
+                    RecordId = bid.RecordId,
+                    UserId = bid.UserId,
+                    Created = bid.Created
+                }
             };
 
             var now = DateTime.Now;
@@ -90,6 +120,7 @@ namespace SA.WebApi.Controllers
             {
                 response.Status = MessageStatusEnum.Warning;
                 response.Code = "bidOverpaid";
+                response.Entity.RecordValidTo = record.ValidTo;
                 return Json(response);
             }
 
@@ -109,7 +140,13 @@ namespace SA.WebApi.Controllers
                     // need to extend auction aswell
                     var auction = await _auctionRepository.GetOneAsync<Auction>(x => x.Id == record.AuctionId);
                     auction.ValidTo = extendTo;
+                    response.Entity.RecordValidTo = extendTo;
+
                     await _auctionRepository.UpdateAsync(auction);
+                }
+                else
+                {
+                    response.Entity.RecordValidTo = record.ValidTo;
                 }
 
                 response.Status = MessageStatusEnum.Success; ;
