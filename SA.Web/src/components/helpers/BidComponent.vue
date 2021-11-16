@@ -11,7 +11,7 @@
                               v-validate="{
             required: true,
             numeric: true,
-            min_value: this.record.currentPrice + this.record.minimumBid
+            min_value: minValueValidation(this.record.currentPrice)
           }"
                               :error-messages="errors.collect('bid')"
                               data-vv-name="bid"
@@ -94,6 +94,14 @@
         private watchPrice(newPrice: number) {
             if (newPrice > this.localBid) {
                 this.localBid = newPrice + this.record.minimumBid;
+            }
+        }
+
+        private minValueValidation(currentPrice: number) {
+            if (this.record.bids.length === 0) {
+                return this.record.currentPrice;
+            } else {
+                return this.record.currentPrice + this.record.minimumBid;
             }
         }
 
