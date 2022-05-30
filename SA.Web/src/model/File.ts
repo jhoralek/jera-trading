@@ -6,4 +6,6 @@ export default interface File {
     name: string;
     created?: Date;
     id?: number;
+    userId: number;
+    recordId: number;
 }

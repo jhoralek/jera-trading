@@ -31,8 +31,10 @@ namespace SA.WebApi.Controllers
         [Route("getFilesByRecordId")]
         [HttpGet("{id}")]
         public ActionResult GetFilesByRecordId(int id)
-            => Json(_mapper.ProjectTo<FileSimpleDto>(_repository.Context.Files.Where(f => f.RecordId == id)));
+            => Json(_repository.Context.Files.Where(f => f.RecordId == id));
 
+        public ActionResult GetSimpleFilesByRecordId(int id)
+            => Json(_mapper.ProjectTo<FileSimpleDto>(_repository.Context.Files.Where(f => f.RecordId == id)));
 
         [Authorize("admin")]
         [HttpPost, DisableRequestSizeLimit]

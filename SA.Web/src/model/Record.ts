@@ -1,5 +1,5 @@
-import { User} from '@/model';
-import { FileSimpleDto, BidDto, AuctionDto } from '@/poco';
+import { User, File} from '@/model';
+import { BidDto, AuctionDto } from '@/poco';
 
 export default interface Record {
     isActive: boolean;
@@ -37,7 +37,7 @@ export default interface Record {
     maximumWeight?: string; // maximalni povolena hmotnost
     mostTechnicallyWeightOfRide?: string; // nejvetsi technicky pripustna hmotnost jizdni soupravy
     maximumWeightOfRide?: string; // nejvetsi povolena hmotnost jizdni soupravy
-    files?: FileSimpleDto[];
+    files?: File[];
     bids?: BidDto[];
     id?: number;
     currentPrice: number;
