@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SA.Application.Records
 {
@@ -11,5 +9,6 @@ namespace SA.Application.Records
         public virtual string Path { get; set; }
         public virtual int UserId { get; set; }
         public virtual int RecordId { get; set; }
+        public virtual DateTime Created { get; set; }
     }
 }

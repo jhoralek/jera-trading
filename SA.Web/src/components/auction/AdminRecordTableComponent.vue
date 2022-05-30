@@ -557,6 +557,7 @@ export default class AdminRecordTableComponent extends BaseComponent {
 
   @RecordAction('initialCurrent') private initCurrent: any;
   @RecordAction('getDetail') private getDetail: any;
+  @RecordAction('getRecordFiles') private getRecordFiles: any;
   @RecordAction('createRecord') private create: any;
   @RecordGetter('getBids') private bids: BidDto[];
   @RecordGetter('getCurrent') private current: Record;
@@ -880,9 +881,11 @@ export default class AdminRecordTableComponent extends BaseComponent {
   private edit(item: RecordTableDto): void {
     if (item.id > 0) {
       // this.loading = true;
-      this.getDetail(item.id).then((response) => {
-        this.formActive = response as boolean;
-        this.loading = false;
+        this.getDetail(item.id).then((response) => {
+            this.getRecordFiles(item.id).then((respImages) => {
+                this.formActive = response as boolean;
+                this.loading = false;
+            });
       });
     }
   }

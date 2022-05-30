@@ -1,7 +1,7 @@
 import { MutationTree } from 'vuex';
 import { RecordState } from '@/store/types';
-import { Record } from '@/model';
-import { FileSimpleDto, RecordTableDto, BidDto, RecordMinimumDto } from '@/poco';
+import { Record, File } from '@/model';
+import { RecordTableDto, BidDto, RecordMinimumDto } from '@/poco';
 
 const DATE_FORMAT = 'DD.MM.YYYY HH:mm';
 
@@ -60,13 +60,23 @@ const mutations: MutationTree<RecordState> = {
         state.records = state.records
             .filter((item) => item.id !== record.id);
     },
-    RECORD_SET_CURRENT_FILES(state, files: FileSimpleDto[]) {
+    RECORD_SET_CURRENT_FILES(state, files: File[]) {
         state.error = false;
         if (state.current !== undefined) {
-            state.current.files = files;
+
+            state.current.files = files.map((file) => ({
+                id: file.id,
+                name: file.name,
+                path: file.path,
+                record: file.record,
+                user: file.user,
+                recordId: file.recordId,
+                userId: file.userId,
+                created: new Date(file.created),
+            })) as File[];
         }
     },
-    RECORD_APPEND_CURRENT_FILES(state, files: FileSimpleDto[]) {
+    RECORD_APPEND_CURRENT_FILES(state, files: File[]) {
         state.error = false;
         files.forEach((x) => state.current.files.push(x));
     },

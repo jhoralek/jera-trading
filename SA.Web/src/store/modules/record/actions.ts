@@ -157,11 +157,11 @@ const actions: ActionTree<RecordState, RootState> = {
                 });
         });
     },
-    getRecordFiles({ commit, rootState, dispatch }, id: number): Promise<FileSimpleDto[]> {
-        return new Promise<FileSimpleDto[]>((resolve) => {
+    getRecordFiles({ commit, rootState, dispatch }, id: number): Promise<File[]> {
+        return new Promise<File[]>((resolve) => {
             return axios.get(`${rootState.settings.apiUrl}/files/getFilesByRecordId?id=${id}`)
                 .then((response) => {
-                    const r: FileSimpleDto[] = response.data as FileSimpleDto[];
+                    const r: File[] = response.data as File[];
 
                     commit(RECORD_SET_CURRENT_FILES, r);
 
@@ -400,7 +400,7 @@ const actions: ActionTree<RecordState, RootState> = {
             return resolve(true);
         });
     },
-    setFiles({ commit }, files: FileSimpleDto[]): Promise<boolean> {
+    setFiles({ commit }, files: File[]): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             commit(RECORD_SET_CURRENT_FILES, files);
             return resolve(true);
