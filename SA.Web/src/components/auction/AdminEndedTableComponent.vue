@@ -305,7 +305,6 @@ export default class AdminEndedTableComponent extends BaseComponent {
 
 .info-value {
   font-size: 13px !important;
-  font-weight: bold;
   font-style: normal;
   font-stretch: normal;
   line-height: 2;

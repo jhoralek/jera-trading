@@ -57,8 +57,8 @@
                     <v-container grid-list-xs pa-0>
                         <v-layout row wrap>
                             <v-flex xs12>
-                                <v-expansion-panel expand>
-                                    <v-expansion-panel-content :value="expander1">
+                                <v-expansion-panel expand v-model="expander1">
+                                    <v-expansion-panel-content :key="0">
                                         <div slot="header">
                                             <h3>{{ resx('auctionDetailInformation') }}</h3>
                                         </div>
@@ -105,9 +105,7 @@
                                             </v-flex>
                                         </v-layout>
                                     </v-expansion-panel-content>
-                                </v-expansion-panel>
-                                <v-expansion-panel expand>
-                                    <v-expansion-panel-content :value="expander">
+                                    <v-expansion-panel-content :key="1">
                                         <div slot="header">
                                             <h3>{{ resx('specification') }}</h3>
                                         </div>
@@ -163,8 +161,8 @@
                     <v-container grid-list-xs pa-0>
                         <v-layout column fill-height>
                             <v-flex xs12>
-                                <v-expansion-panel expand>
-                                    <v-expansion-panel-content :value="expander">
+                                <v-expansion-panel expand v-model="expander2">
+                                    <v-expansion-panel-content :key="0">
                                         <div slot="header">
                                             <h3>{{ resx('carInformation') }}</h3>
                                         </div>
@@ -247,9 +245,7 @@
                                             </v-flex>
                                         </v-layout>
                                     </v-expansion-panel-content>
-                                </v-expansion-panel>
-                                <v-expansion-panel expand>
-                                    <v-expansion-panel-content :value="expander">
+                                    <v-expansion-panel-content :key="1">
                                         <div slot="header">
                                             <h3>{{ resx('equipment') }}</h3>
                                         </div>
@@ -258,9 +254,7 @@
                                             </v-flex>
                                         </v-layout>
                                     </v-expansion-panel-content>
-                                </v-expansion-panel>
-                                <v-expansion-panel expand>
-                                    <v-expansion-panel-content :value="expander">
+                                    <v-expansion-panel-content :key="2">
                                         <div slot="header">
                                             <h3>{{ resx('defects') }}</h3>
                                         </div>
@@ -269,9 +263,7 @@
                                             </v-flex>
                                         </v-layout>
                                     </v-expansion-panel-content>
-                                </v-expansion-panel>
-                                <v-expansion-panel expand>
-                                    <v-expansion-panel-content :value="expander">
+                                    <v-expansion-panel-content :key="3">
                                         <div slot="header">
                                             <h3>{{ resx('moreDescription') }}</h3>
                                         </div>
@@ -365,8 +357,8 @@
         private featuredAcutions: any;
 
         private isLoading: boolean = false;
-        private expander: boolean[] = [true, true, true, true, true, true];
-        private expander1: boolean[] = [true];
+        private expander1: boolean[] = [true, true];
+        private expander2: boolean[] = [true, true, true, true];
         private canBid: boolean = false;
         private isMounted: boolean = false;
 
@@ -596,7 +588,6 @@
 
         .auction-detail .info-value {
             font-size: 13px !important;
-            font-weight: bold;
             font-style: normal;
             font-stretch: normal;
             line-height: 2;

@@ -15,4 +15,5 @@ export default interface UserSimpleDto {
     birthNumber: string;
     actualAuctions: RecordTableDto[];
     endedAuctions: RecordTableDto[];
+    sendEmail: boolean;
 }

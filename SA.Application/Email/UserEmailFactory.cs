@@ -44,7 +44,7 @@ namespace SA.Application.Email
             email.Subject = $"Reset hesla uživatele { user.UserName }";
             email.Content = $@"<p>Bylo zažádáno o obnovení hesla pro uživatele <strong>{ user.UserName }</strong>. Pokud jste o změnu nežádali, dejte nám prosím vědět a žádný úkon neprovádějte.</p>
 <p>Pro obnovení hesla přejděte na stránky prostřednictvím odkazu { resetPasswordHyperlink }</p>
-<p>Váš tým <strong>Jera Trading s.r.o.</strong></p>";
+<p>Váš tým <strong>JERA Trading s.r.o.</strong></p>";
 
             await _emailService.Send(email);
 
@@ -85,9 +85,9 @@ namespace SA.Application.Email
                     break;
             }
 
-            email.Subject = "Registrace na webu Jera Trading s.r.o.";
+            email.Subject = "Registrace na webu JERA Trading s.r.o.";
             email.Content = $@"<h1>Děkujeme za registraci na portálu Jera Trading s.r.o.</h1>
-<p>Rekapitulace reigstrovaných informací</p>
+<p>Rekapitulace registrovaných informací</p>
 <h4>Uživatel</h4>
 <ul>
     <li>Uživatelské jméno: <strong>{user.UserName}</strong></li>
@@ -112,7 +112,7 @@ namespace SA.Application.Email
     <li>Město: { user.Customer.Address.City }</li>
 </ul><br />
 <p>Pro dokončení registrace prosím potvrďte kliknutím na tento odkaz { registrationHyperlink }</p>
-<p>Váš tým <strong>Jera Trading s.r.o.</strong></p>";
+<p>Váš tým <strong>JERA Trading s.r.o.</strong></p>";
 
             await _emailService.Send(email);
 
@@ -134,7 +134,7 @@ namespace SA.Application.Email
                 Address = user.Customer.Email
             });
 
-            email.Subject = $"Výhra v aukci Jera Trading s.r.o. na položku { record.Name }";
+            email.Subject = $"Výhra v aukci JERA Trading s.r.o. na položku { record.Name }";
             email.Content = $@"<h1>Gratulujeme k výhře v aukci ""{ record.Name }""</h1>
 <h3>Rekapitulace aukce</h3>
 <ul>
@@ -168,7 +168,7 @@ namespace SA.Application.Email
                 Address = user.Customer.Email
             });
 
-            email.Subject = $"Byl jste přehozen v aukci Jera Trading s.r.o. na položce { record.Name }";
+            email.Subject = $"Byl jste přehozen v aukci JERA Trading s.r.o. na položce { record.Name }";
             email.Content = $@"<h1>Bohužel jste byl přehozen</h1>
 <p>Aukce končí {record.ValidTo.ToString("dd.MM.yyyy HH:mm")}. Aktuální cena dražené položky je { record.CurrentPrice.ToString("C", new CultureInfo("cs-CZ")) } .</p>
 <p>Pokud chcete v aukci nadále pokračovat můžete přejít na položku tímto odkazem. <a href='{_configuration["Web:Url"]}/auctionDetail?id={record.Id}'>{ record.Name }</a></p>";
@@ -176,6 +176,25 @@ namespace SA.Application.Email
             await _emailService.Send(email);
 
             return email;
+        }
+
+        /// <summary>
+        /// Odesle email dle prevzatych parametru z venci.
+        /// Odesilatel bude vzdy NoReply
+        /// </summary>
+        /// <param name="emessage"></param>
+        /// <returns></returns>
+        public async Task<EmailMessage> SendEmail(EmailMessage message)
+        {
+            message.FromAddresses.Add(new EmailAddress
+            {
+                Name = SENDER_NAME,
+                Address = _emailConfiguration.NoReplyEmail
+            });
+
+            await _emailService.Send(message);
+
+            return message;
         }
     }
 }

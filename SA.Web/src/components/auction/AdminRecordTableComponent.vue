@@ -24,6 +24,37 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="showMoveDialog" persistent max-width="700px">
+      <v-card v-if="objectToMove !== null">
+        <v-card-title class="headline grey lighten-2">
+          {{ resx('recordMove') }}: {{ record.current.name }}
+        </v-card-title>
+        <v-layout row wrap v-if="auctionsCombo">
+          <v-flex xs12>
+            <v-select
+              v-model="record.current.auctionId"
+              v-validate="'required'"
+              data-vv-name="auctionId"
+              :error-messages="errors.collect('auctionId')"
+              item-value="id"
+              item-text="name"
+              single-line
+              :label="labelAuction"
+              :items="auctionsCombo"
+              @change="auctionChange" />
+          </v-flex>
+        </v-layout>
+         <v-divider></v-divider>
+        <v-card-actions>
+          <v-container>
+            <v-layout row wrap justify-end align-center>
+              <v-btn color="black" class="white-btn" @click="saveMove()">{{ resx('submit') }}</v-btn>
+              <v-btn color="black" class="white-btn" @click="disposeMoveDialog()">{{ resx('close') }}</v-btn>
+            </v-layout>
+          </v-container>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="showCustomerInfo" persistent max-width="500px">
       <v-card v-if="customerInfo !== null">
         <v-card-title class="headline grey lighten-2">
@@ -490,6 +521,13 @@
                       @click="wantToDeleteRecord(props.item)">
                       delete
                   </v-icon>
+                  <v-icon
+                      style="cursor: pointer"
+                      small
+                      class="mr-2"
+                      @click="moveRecordDialog(props.item)">
+                      swap_horiz
+                  </v-icon>
               </td>
             </template>
           </v-data-table>
@@ -555,13 +593,13 @@ export default class AdminRecordTableComponent extends BaseComponent {
   @Prop({default: []}) private records: RecordTableDto[];
   @Prop({default: false}) private loading: boolean;
 
-  @RecordAction('initialCurrent') private initCurrent: any;
-  @RecordAction('getDetail') private getDetail: any;
-  @RecordAction('getRecordFiles') private getRecordFiles: any;
   @RecordAction('createRecord') private create: any;
   @RecordGetter('getBids') private bids: BidDto[];
   @RecordGetter('getCurrent') private current: Record;
 
+  @RecordAction('initialCurrent') private initCurrent: any;
+  @RecordAction('getDetail') private getDetail: any;
+  @RecordAction('getRecordFiles') private getRecordFiles: any;
   @RecordAction('deleteRecord') private delete: any;
   @RecordAction('updateRecord') private updateRecord: any;
   @RecordAction('setFiles') private setFiles: any;
@@ -571,9 +609,11 @@ export default class AdminRecordTableComponent extends BaseComponent {
   @RecordAction('setCurrentRecordDates') private setCurrentDates: any;
   @RecordAction('setCurrentRecordDatesFromAuction') private setCurrentDateFromAuction: any;
   @RecordAction('getRecordsBidForAdmin') private getRecordsBidForAdmin: any;
+  @RecordAction('getAuctionRecordsForAdmin') private loadRecords: any;
 
   @AuctionAction('getAllLookup') private loadAuctionsCombo: any;
   @AuctionAction('getDetail') private getSelectedAuction: any;
+  @AuctionAction('getAllForAdmin') private loadAuctions: any;
   @AuctionGetter('getLookupList') private auctionsCombo: AuctionLookupDto[];
 
   @ProfileAction('getCustomerInfo')
@@ -583,6 +623,7 @@ export default class AdminRecordTableComponent extends BaseComponent {
   private timeFrom: string = null;
   private questionDialog: boolean = false;
   private objectToDelete: RecordTableDto = undefined;
+  private objectToMove: Record = null;
   private state: number = 1;
   private formActive: boolean = false;
   private headers: any[] = [];
@@ -591,6 +632,7 @@ export default class AdminRecordTableComponent extends BaseComponent {
       totalItems: 0,
   };
   private showBidsInfo: boolean = false;
+  private showMoveDialog: boolean = false;
   private bidsInfo: BidDto[] = null;
 
   private showCustomerInfo: boolean = false;
@@ -611,6 +653,10 @@ export default class AdminRecordTableComponent extends BaseComponent {
   private disposeBidsInfo(): void {
     this.bidsInfo = null;
     this.showBidsInfo = false;
+  }
+
+  private disposeMoveDialog(): void {
+    this.showMoveDialog = false;
   }
 
   private showCustomer(userId: number): void {
@@ -662,7 +708,7 @@ export default class AdminRecordTableComponent extends BaseComponent {
           sortable: true,
           value: 'currentPrice' });
       this.headers.push({
-          text: this.settings.resource.numberOfBids,
+          text: this.settings.resource.bids,
           align: 'right',
           sortable: false,
           value: 'numberOfBids' });
@@ -840,6 +886,17 @@ export default class AdminRecordTableComponent extends BaseComponent {
     }
   }
 
+  private saveMove(): void {
+    this.updateRecord(this.record.current).then((response) => {
+      if (response) {
+        this.loadRecords(this.auction.id).then(() => {
+          this.disposeMoveDialog();
+          this.loadAuctions();
+        });
+      }
+    });
+  }
+
   private deleteImage(file: FileSimpleDto): void {
     if (this.record.current !== undefined) {
       const filesToRemain: FileSimpleDto[] = this.record.current.files
@@ -893,6 +950,15 @@ export default class AdminRecordTableComponent extends BaseComponent {
   private wantToDeleteRecord(item: RecordTableDto): void {
     this.questionDialog = true;
     this.objectToDelete = item;
+  }
+
+  private moveRecordDialog(item: RecordTableDto): void {
+    this.showMoveDialog = true;
+    this.getDetail(item.id).then((response) => {
+      this.getRecordFiles(item.id).then(() => {
+          this.objectToMove = response;
+      });
+    });
   }
 
   private deleteRecord(decision: boolean): void {

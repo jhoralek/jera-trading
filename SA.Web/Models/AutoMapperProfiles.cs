@@ -53,7 +53,8 @@ namespace SA.Web.Models
                 .ForMember(dto => dto.PhoneNumber, dto => dto.MapFrom(x => x.Customer.PhoneNumber))
                 .ForMember(dto => dto.Email, dto => dto.MapFrom(x => x.Customer.Email))
                 .ForMember(dto => dto.BirthNumber, dto => dto.MapFrom(x => x.Customer.BirthNumber))
-                .ForMember(dto => dto.CompanyNumber, dto => dto.MapFrom(x => x.Customer.CompanyNumber));
+                .ForMember(dto => dto.CompanyNumber, dto => dto.MapFrom(x => x.Customer.CompanyNumber))
+                .ForMember(dto => dto.SendEmail, dto => dto.MapFrom(x => false));
             CreateMap<User, UserShortDto>()
                 .ForMember(dto => dto.Email, dto => dto.MapFrom(x => x.Customer.Email))
                 .ForMember(dto => dto.PhoneNumber, dto => dto.MapFrom(x => x.Customer.PhoneNumber))
@@ -76,7 +77,7 @@ namespace SA.Web.Models
             CreateMap<Auction, AuctionTableDto>()
                 .ForMember(dto => dto.NumberOfRecords, dto => dto.MapFrom(x => x.Records.Count()));
             CreateMap<Auction, AuctionLookupDto>()
-                .ForMember(dto => dto.Name, dto => dto.MapFrom(x => $"{x.Name} - [{x.ValidFrom.ToString("dd.MM.yyyy HH:mm")} - {x.ValidTo.ToString("dd.MM.yyyy HH:mm")}] - { (x.IsActive ? "Aktivní" : "Neaktivní") }"));
+                .ForMember(dto => dto.Name, dto => dto.MapFrom(x => $"{x.Name} - [{x.ValidFrom.ToString("dd.MM.yyyy HH:mm")} - {x.ValidTo.ToString("dd.MM.yyyy HH:mm")}] - {(x.IsActive ? "Aktivní" : "Neaktivní")}"));
 
             // reverse mapping
             CreateMap<UserDto, User>();

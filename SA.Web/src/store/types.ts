@@ -67,6 +67,7 @@ export interface RecordState {
   current?: Record;
   currentWinnerId: number;
   records: RecordTableDto[];
+  endedRecords: RecordTableDto[];
   error: boolean;
 }
 

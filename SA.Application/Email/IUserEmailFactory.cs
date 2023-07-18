@@ -14,5 +14,7 @@ namespace SA.Application.Email
         Task<EmailMessage> ResetPassword(UserSimpleDto user, UserActivation activation);
 
         Task<EmailMessage> SendAuctionOverbidenEmail(User user, RecordTableDto record);
+
+        Task<EmailMessage> SendEmail(EmailMessage email);
     }
 }

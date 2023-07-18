@@ -63,7 +63,7 @@ namespace SA.Core.Model
         [MaxLength(100)]
         public virtual string State { get; set; }
 
-        [MaxLength(250)]
+
         public virtual string Equipment { get; set; }
 
         [MaxLength(45)]

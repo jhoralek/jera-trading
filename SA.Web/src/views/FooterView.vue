@@ -9,19 +9,19 @@
 
             <v-card-actions class="footer-colaboration">
                 <v-layout row wrap class="text-xs-center">
-                    <v-flex xs12 md4>
+                    <v-flex xs12 md6>
                         <a href="https://www.suas.cz/" target="blank">
                             <img :src="sokolovskaLogo" />
                         </a>
                     </v-flex>
-                    <v-flex xs12 md4>
+                    <!-- <v-flex xs12 md4>
                         <a href="https://www.suas.cz/" target="blank">
                             <img :src="sokolovskaLogo" />
                         </a>
-                    </v-flex>
-                    <v-flex xs12 md4>
+                    </v-flex> -->
+                    <v-flex xs12 md6>
                         <a href="https://www.suas.cz/" target="blank">
-                            <img :src="sokolovskaLogo" />
+                            <img :src="sausGroupLogo" />
                         </a>
                     </v-flex>
                 </v-layout>
@@ -86,6 +86,10 @@ export default class FooterView extends BaseView {
 
     get sokolovskaLogo(): string {
         return `${this.settings.apiUrl.replace('/api', '')}/img/sokolovska-logo.png`;
+    }
+
+    get sausGroupLogo(): string {
+        return `${this.settings.apiUrl.replace('/api', '')}/img/saus-group-logo.png`;
     }
 }
 

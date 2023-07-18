@@ -1,6 +1,6 @@
 import { MutationTree } from 'vuex';
 import { RecordState } from '@/store/types';
-import { Record, File } from '@/model';
+import { Record, File, Bid } from '@/model';
 import { RecordTableDto, BidDto, RecordMinimumDto } from '@/poco';
 
 const DATE_FORMAT = 'DD.MM.YYYY HH:mm';
@@ -45,6 +45,14 @@ const mutations: MutationTree<RecordState> = {
         if (record !== null && record.stk !== null) {
             state.current.stk = new Date(record.stk);
         }
+    },
+    RECORD_SET_ENDED_RECORDS(state, records: RecordTableDto[]) {
+        state.error = false;
+        state.endedRecords = records;
+    },
+    RECORD_CLEAR_ENDED_RECORDS(state) {
+        state.error = false;
+        state.endedRecords = [];
     },
     /**
      * Change list of records
@@ -108,6 +116,22 @@ const mutations: MutationTree<RecordState> = {
 
         if (state.current !== undefined) {
             state.current.numberOfBids = numberOfBids;
+        }
+    },
+    RECORD_TAKE_ON_BID_FROM_CURRENT(state) {
+        state.error = false;
+
+        if (state.current !== undefined) {
+            state.current.numberOfBids -= 1;
+        }
+    },
+    RECORD_NUMBER_OF_BIDS_DECREASE(state, recordId: number) {
+        state.error = false;
+
+        const record: RecordTableDto = state.records.filter((item) => item.id === recordId)[0];
+
+        if (record !== null) {
+            record.numberOfBids -= 1;
         }
     },
     RECORD_CHANGE_WINNING_USER_ID(state, bid: BidDto) {

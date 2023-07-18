@@ -9,6 +9,8 @@ import MessageStatusEnum from './MessageStatusEnum';
 import { GdprApplicationType } from './GdprApplicationType';
 import GdprRecord from './GdprRecord';
 import Auction from './Auction';
+import EmailAddress from '../model/EmailAddress';
+import EmailMessage from './EmailMessage';
 
 export {
     Address,
@@ -22,4 +24,6 @@ export {
     GdprApplicationType,
     GdprRecord,
     Auction,
+    EmailAddress,
+    EmailMessage,
 };

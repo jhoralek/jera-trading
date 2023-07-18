@@ -67,14 +67,14 @@ const RecordGetter = namespace('record', Getter);
     },
 })
 export default class AuctionEndedComponent extends BaseComponent {
-  @RecordGetter('getRecords') private records: RecordTableDto[];
+  @RecordGetter('getEndedRecors') private records: RecordTableDto[];
   @RecordAction('getLatestEndedRecords') private loadRecods: any;
 
   private isLoading: boolean = false;
 
   private mounted() {
     this.isLoading = true;
-    this.loadRecods(20).then((respAuction) => {
+    this.loadRecods(10).then(() => {
         this.isLoading = false;
     });
   }
