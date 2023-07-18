@@ -29,5 +29,7 @@ namespace SA.Application.Account
         public virtual string BirthNumber { get; set; }
 
         public virtual string CompanyNumber { get; set; }
+
+        public virtual bool SendEmail { get; set; }
     }
 }

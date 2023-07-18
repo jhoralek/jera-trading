@@ -32,6 +32,11 @@ const getters: GetterTree<RecordState, RootState> = {
         return records;
     },
 
+    getEndedRecors(state): RecordTableDto[] {
+        const { endedRecords } = !state.error && state;
+        return endedRecords;
+    },
+
     getBids(state): BidDto[] {
         const { bids } = !state.error && state.current;
         return bids;

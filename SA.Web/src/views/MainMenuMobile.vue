@@ -96,7 +96,7 @@
                 </router-link>
             </v-flex>
             </v-card>
-            <v-card v-if="auth.isAuthenticated">
+            <v-card v-if="auth.isAuthenticated && auth.isDealer">
             <v-flex justify-start offset-xs1>
                 <router-link
                 class="nav-item btn btn--flat btn--router"
@@ -114,7 +114,7 @@
                 </router-link>
             </v-flex>
             </v-card> -->
-            <v-card v-if="auth.isAuthenticated">
+            <v-card v-if="auth.isAuthenticated && auth.isDealer">
             <v-flex justify-start offset-xs1>
                 <router-link
                 class="nav-item btn btn--flat btn--router"

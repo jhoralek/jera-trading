@@ -161,6 +161,11 @@ namespace SA.WebApi.Controllers
             return Json(response);
         }
 
+        [Authorize("admin")]
+        [HttpDelete("{id}")]
+        [Route("delete")]
+        public async Task<IActionResult> Delete(int id)
+            => Json(await _repository.RemoveAsync(id));
 
         [Authorize("read:messages")]
         [HttpGet("{recordId}")]
@@ -184,7 +189,7 @@ namespace SA.WebApi.Controllers
                 var overbidedUserId = userOverbidedIds.Last();
                 var overbidedUser = await _userRepository.GetOneAsync<User>(x => x.Id == overbidedUserId);
 
-                await _userEmailFactory.SendAuctionOverbidenEmail(overbidedUser, record);
+                // await _userEmailFactory.SendAuctionOverbidenEmail(overbidedUser, record);
 
                 return Json(true);
             }

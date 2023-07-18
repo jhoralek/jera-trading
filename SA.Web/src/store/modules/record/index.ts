@@ -9,6 +9,7 @@ export const state: RecordState = {
     current: undefined,
     currentWinnerId: -1,
     records: [],
+    endedRecords: [],
     error: false,
 };
 

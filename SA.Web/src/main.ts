@@ -15,6 +15,7 @@ import '@/registerServiceWorker';
 import 'vuetify/dist/vuetify.min.css';
 import 'vue-wysiwyg/dist/vueWysiwyg.css';
 import wysiwyg from 'vue-wysiwyg';
+import Lingallery from 'lingallery';
 
 import cs from 'vee-validate/dist/locale/cs';
 import en from 'vee-validate/dist/locale/en';
@@ -47,6 +48,8 @@ Vue.use(VeeValidate, {
   locale: 'cs',
   dictionary: { cs, en, sk, de, ru },
 });
+
+Vue.component('lingallery', Lingallery);
 
 new Vue({
   router,

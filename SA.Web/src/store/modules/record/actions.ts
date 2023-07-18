@@ -11,6 +11,8 @@ import { Record, MessageStatusEnum, Bid, Auction } from '@/model';
 import {
     RECORD_INITIAL_STATE,
     RECORD_CHANGE_LIST_STATE,
+    RECORD_SET_ENDED_RECORDS,
+    RECORD_CLEAR_ENDED_RECORDS,
     RECORD_CHANGE_CURRENT_STATE,
     RECORD_INITIAL_CURRENT,
     RECORD_DELETE_RECORD_FROM_LIST,
@@ -26,6 +28,8 @@ import {
     RECORD_CHANGE_CURRENT_PRICE_TO_START_PRICE,
     RECORD_SET_CURRENT_PRICE,
     RECORD_EXTEND_VALID_TO,
+    RECORD_TAKE_ON_BID_FROM_CURRENT,
+    RECORD_NUMBER_OF_BIDS_DECREASE,
 } from '@/store/mutation-types';
 import {
     RecordTableDto,
@@ -425,7 +429,6 @@ const actions: ActionTree<RecordState, RootState> = {
                         },
                     },
                         { root: true });
-                    dispatch('record/getAllForAdmin', {}, { root: true });
                     dispatch('record/initialCurrent', {}, { root: true });
                     return resolve(true);
                 })
@@ -441,6 +444,44 @@ const actions: ActionTree<RecordState, RootState> = {
                     return resolve(undefined);
                 });
         });
+    },
+    deleteBid({commit, rootState, dispatch}, bidId: number): Promise<boolean> {
+        return new Promise<boolean>((resolve) => {
+            return axios.delete(`${rootState.settings.apiUrl}/bids/delete`,
+                {
+                    params: {
+                        id: bidId,
+                    },
+                    headers: {
+                        authorization: rootState.auth.token,
+                    },
+                })
+                .then((response) => {
+                    const bid = response.data as Bid;
+
+                    commit(RECORD_NUMBER_OF_BIDS_DECREASE, bid.recordId);
+                    dispatch('message/change', {
+                        mod: 'Bid',
+                        message: {
+                            state: MessageStatusEnum.Success,
+                            message: 'deleteSuccessfully',
+                        },
+                    },
+                        { root: true });
+                    return resolve(true);
+                })
+                .catch((error) => {
+                    dispatch('message/change', {
+                        mod: 'Bid',
+                        message: {
+                            state: MessageStatusEnum.Error,
+                            message: error.message,
+                        },
+                    },
+                        { root: true });
+                    return resolve(false);
+                });
+            });
     },
     deleteRecord({ commit, rootState, dispatch }, recordId: number): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
@@ -555,7 +596,8 @@ const actions: ActionTree<RecordState, RootState> = {
         return new Promise<boolean>((resolve) => {
             return axios.get(`${rootState.settings.apiUrl}/records/getLatestEndedRecords?take=${take}`)
                 .then((response) => {
-                    commit(RECORD_CHANGE_LIST_STATE, response.data as RecordTableDto[]);
+                    commit(RECORD_CLEAR_ENDED_RECORDS);
+                    commit(RECORD_SET_ENDED_RECORDS, response.data as RecordTableDto[]);
                     return resolve(true);
                 })
                 .catch((error) => {

@@ -17,7 +17,8 @@
           <router-link class="cookie-consent-link" to="/cookies">{{ resx('showDetails') }}</router-link>
         </template>
         <template slot="button">
-          <v-btn white>{{ resx('agree') }}</v-btn>
+          <v-btn white>{{ resx('cookiesAll') }}</v-btn>
+          <v-btn white>{{ resx('cookiesOnlyNecessary') }}</v-btn>
         </template>
       </cookie-consent>
     </v-app>

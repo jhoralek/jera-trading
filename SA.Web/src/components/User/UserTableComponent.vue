@@ -1,5 +1,38 @@
 <template>
   <div class="user-admin-table">
+      <v-dialog v-model="emailDialog" max-width="700px" v-if="profile.user" persistent>
+        <v-card>
+            <v-progress-linear v-if="sendingEmails" indeterminate></v-progress-linear>
+
+            <v-card-title>
+                <span class="headline">{{ resx('emailMultiple') }} {{ resx('for') }}: {{ numberOfSelectedUsers() }} {{ resx('users') }}</span>
+            </v-card-title>
+
+            <v-card-text>
+                <v-container grid-list-xs pa-0>
+                    <v-layout row wrap>
+                        <v-text-field
+                            filled
+                            v-model="emailMessage.subject"
+                            :label="labelSubject"
+                            prepend-inner-icon="mdi-magnify">
+                    </v-text-field>
+                    </v-layout>
+                    <v-layout row wrap>
+                        <wysiwyg
+                          v-model="emailMessage.content"
+                          :placeholder="labelEmail" />
+                    </v-layout>
+                </v-container>
+            </v-card-text>
+
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="info" flat @click.native="closeEmailDialog">{{ resx('cancel') }}</v-btn>
+                <v-btn color="success" :disabled="!canSendEmails()" flat @click.native="sendEmails">{{ resx('submit') }}</v-btn>
+            </v-card-actions>
+        </v-card>
+      </v-dialog>
       <v-dialog v-model="dialog" max-width="500px" v-if="profile.user" persistent>
         <v-card>
           <v-progress-linear v-if="actionInProgress" indeterminate></v-progress-linear>
@@ -52,7 +85,7 @@
       </v-dialog>
       <v-container  grid-list-xs pa-0>
           <v-layout>
-            <v-flex xs3>
+            <v-flex xs5>
                 <v-chip
                     class="ma-2"
                     color="red"
@@ -71,6 +104,11 @@
                     text-color="white">
                       {{ resx('active' )}}
                 </v-chip>
+                <v-btn
+                    color="primary"
+                    @click="showEmailDialog()">
+                    {{ resx('emailMultiple') }}
+                </v-btn>
             </v-flex>
             <v-flex xs2 class="text-xs-left">
                 <v-text-field
@@ -101,6 +139,11 @@
                     v-model="isFeePayed"
                     :label="labelIsFeePayed " />
             </v-flex>
+            <v-flex xs2 class="text-xs-right">
+                <v-switch
+                    v-model="selectAll"
+                    :label="labelSelectAll" />
+            </v-flex>
           </v-layout>
           <v-layout row wrap>
               <v-flex xs12>
@@ -118,6 +161,12 @@
                             row_color_feePayed: feePayedColor(props.item),
                             row_color_noActive: notActiveColor(props.item)
                         }">
+                            <td>
+                                <v-checkbox
+                                    hide-details
+                                    class="shrink mr-2"
+                                    v-model="props.item.sendEmail" />
+                            </td>
                             <td>{{ props.item.userName }}</td>
                             <td>{{ props.item.email }}</td>
                             <td>{{ props.item.phoneNumber }}</td>
@@ -171,10 +220,12 @@
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import { State, Action, Getter, namespace } from 'vuex-class';
 
-import { Customer } from './../../model';
+import { Customer, EmailAddress, EmailMessage } from './../../model';
 import { UserSimpleDto } from './../../poco';
 import { ProfileState } from './../../store/types';
 import BaseComponent from '../BaseComponent.vue';
+import { filter } from 'vue/types/umd';
+import { textChangeRangeIsUnchanged } from 'typescript';
 
 const ProfileAction = namespace('profile', Action);
 const ProfileGetter = namespace('profile', Getter);
@@ -193,6 +244,8 @@ export default class UserTableComponent extends BaseComponent {
     private setUser: any;
     @ProfileAction('updateUserAdmin')
     private updateUser: any;
+    @ProfileAction('sendMultipleEmail')
+    private sendMultipleEmail: any;
     @ProfileAction('filterUsers')
     private filterUsers: any;
 
@@ -200,20 +253,25 @@ export default class UserTableComponent extends BaseComponent {
     private currentCustomer: Customer;
 
     private actionInProgress: boolean = false;
+    private sendingEmails: boolean = false;
     private dialog: boolean = false;
+    private emailDialog: boolean = false;
     private headers: any[] = [];
     private pagination: any = {
         rowsPerPage: 10,
         totalItems: 0,
     };
+    private emails: string[] = [];
 
     private searchType: string = '';
     private searchCompanyNumber: string = '';
     private searchTypeItems: any = [];
     private isActive: boolean = false;
     private isFeePayed: boolean = false;
+    private selectAll: boolean = false;
     private searchText: string = '';
     private filterSorceUserList: UserSimpleDto[] = [];
+    private emailMessage: EmailMessage = null;
 
     @Watch('users')
     private changeUsers(users) {
@@ -244,6 +302,13 @@ export default class UserTableComponent extends BaseComponent {
         }
 
         this.filterUsers(filteredUsers);
+    }
+
+    @Watch('selectAll')
+    private selectAllFnc(selectAll) {
+        this.filterSorceUserList.forEach((item) => {
+            item.sendEmail = selectAll;
+        });
     }
 
     @Watch('isActive')
@@ -292,8 +357,16 @@ export default class UserTableComponent extends BaseComponent {
         });
     }
 
+    private showEmailDialog(): void {
+        this.emailDialog = true;
+    }
+
     private closeDialog(): void {
         this.dialog = false;
+    }
+
+    private closeEmailDialog(): void {
+        this.emailDialog = false;
     }
 
     private saveEdit(): void {
@@ -301,6 +374,31 @@ export default class UserTableComponent extends BaseComponent {
         this.updateUser(this.profile.user).then((response) => {
             this.actionInProgress = false;
             this.closeDialog();
+        });
+    }
+
+    private sendEmails(): void {
+        this.sendingEmails = true;
+
+        const addresses = this.filterSorceUserList
+            .filter((item) => item.sendEmail)
+            .map((item) => {
+
+                const address: EmailAddress = {
+                    name: item.userName,
+                    address: item.email,
+                };
+
+                return address;
+            });
+
+        this.emailMessage.toAddresses = addresses;
+
+        this.sendMultipleEmail(this.emailMessage).then((response) => {
+            this.sendingEmails = false;
+
+            this.setEmailObject();
+            this.closeEmailDialog();
         });
     }
 
@@ -343,6 +441,11 @@ export default class UserTableComponent extends BaseComponent {
     }
 
     private mounted() {
+        this.headers.push({
+            text: '',
+            align: 'left',
+            sortable: true,
+            value: 'email' });
         this.headers.push({
             text: this.settings.resource.userName,
             align: 'left',
@@ -403,6 +506,17 @@ export default class UserTableComponent extends BaseComponent {
         );
 
         this.searchType = this.searchTypeItems[0].id;
+
+        this.setEmailObject();
+    }
+
+    private setEmailObject(): void {
+        this.emailMessage = {
+            fromAddresses: [],
+            toAddresses: [],
+            subject: '',
+            content: '',
+        };
     }
 
     private activeColor(item: UserSimpleDto): boolean {
@@ -417,6 +531,16 @@ export default class UserTableComponent extends BaseComponent {
         return item.isFeePayed && item.isActive;
     }
 
+    private canSendEmails(): boolean {
+        return this.filterSorceUserList.filter((item) => item.sendEmail).length > 0
+            && this.emailMessage.content.length > 0
+            && this.emailMessage.subject.length > 0;
+    }
+
+    private numberOfSelectedUsers(): number {
+        return this.filterSorceUserList.filter((user) => user.sendEmail).length;
+    }
+
     get labelIsActive(): string {
         return this.settings.resource.active;
     }
@@ -425,8 +549,16 @@ export default class UserTableComponent extends BaseComponent {
         return this.settings.resource.feePayed;
     }
 
+    get labelSelectAll(): string {
+        return this.settings.resource.selectAll;
+    }
+
     get labelSearch(): string {
         return this.settings.resource.search;
+    }
+
+    get labelSubject(): string {
+        return this.settings.resource.subject;
     }
 
     get labelSearchTypes(): string {
@@ -437,6 +569,10 @@ export default class UserTableComponent extends BaseComponent {
         return this.settings.resource.companyNumber;
     }
 
+    get labelEmail(): string {
+        return this.settings.resource.email;
+    }
+
     get pages() {
         if (this.pagination.rowsPerPage == null ||
             this.pagination.totalItems == null) {
@@ -444,6 +580,8 @@ export default class UserTableComponent extends BaseComponent {
         }
         return Math.ceil(this.pagination.totalItems / this.pagination.rowsPerPage);
     }
+
+
 }
 
 </script>

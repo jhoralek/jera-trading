@@ -9,6 +9,7 @@ using SA.Application.Security;
 using SA.Core.Model;
 using SA.EntityFramework.EntityFramework.Repository;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -64,7 +65,7 @@ namespace SA.WebApi.Controllers
             {
                 var token = Guid.NewGuid().ToString();
                 var activation = await _userActivationRepository.AddAsync(new UserActivation
-                {                    
+                {
                     IsUsed = false,
                     UserId = newUser.Id,
                     Token = token,
@@ -115,6 +116,30 @@ namespace SA.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize("admin")]
+        [Route("sendMultipleEmail")]
+        public async Task<IActionResult> SendMultipleEmail([FromBody] EmailMessage email)
+        {
+            if (!email.ToAddresses.Any())
+            {
+                return Json(false);
+            }
+
+            email.ToAddresses.ForEach(x =>
+            {
+                _userEmailFactory.SendEmail(new EmailMessage
+                {
+                    Subject = email.Subject,
+                    Content = email.Content,
+                    ToAddresses = new List<EmailAddress> { x },
+                    FromAddresses = new List<EmailAddress>()
+                });
+            });
+
+            return Json(true);
+        }
+
+        [HttpPost]
         [Route("updateUserAdmin")]
         [Authorize("admin")]
         public async Task<IActionResult> UpdateUserAdmin([FromBody] UserSimpleDto user)
@@ -151,7 +176,7 @@ namespace SA.WebApi.Controllers
 
             var token = Guid.NewGuid().ToString();
             var activation = await _userActivationRepository.AddAsync(new UserActivation
-            {                
+            {
                 IsUsed = false,
                 UserId = user.Id,
                 Token = token,

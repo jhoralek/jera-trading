@@ -108,3 +108,11 @@ a.v-btn--active.v-btn.v-btn--flat.v-btn--router.login-button .v-btn__content .bt
     color: #929292;
     text-transform: lowercase;
   }
+
+  figure img {
+    width: 1000px !important;
+  }
+
+  .lingallery_thumbnails img {
+    width: 64px !important;
+  }

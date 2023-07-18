@@ -10,11 +10,11 @@
         <home-component />
       </v-flex>
     </v-layout>
-    <v-layout row wrap>
+    <!-- <v-layout row wrap>
       <v-flex xs12>
         <actual-random-component />
       </v-flex>
-    </v-layout>
+    </v-layout> -->
     <v-container grid-list-md class="registration-container" v-if="!auth.isAuthenticated">
       <v-layout row wrap>
         <v-flex xs12>

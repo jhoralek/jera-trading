@@ -5,7 +5,7 @@ import {
     ProfileState,
 } from '@/store/types';
 
-import { User, MessageStatusEnum, Customer, Address, GdprRecord } from '@/model';
+import { User, MessageStatusEnum, Customer, Address, GdprRecord, EmailMessage } from '@/model';
 import { UserShortInfo, UserSimpleDto, GdprRecordTableDto, RecordTableDto, UserShortDto } from '@/poco';
 
 import {
@@ -383,6 +383,34 @@ const actions: ActionTree<ProfileState, RootState> = {
             return axios.get(`${rootState.settings.apiUrl}/users/checkEmail?email=${email}`)
                 .then((response) => {
                     return resolve(response.data as boolean);
+                })
+                .catch((error) => {
+                    dispatch('message/change', {
+                        mod: 'Profile',
+                        message: {
+                            state: MessageStatusEnum.Error,
+                            message: error,
+                        },
+                    },
+                    { root: true });
+                    return resolve(false);
+                });
+        });
+    },
+    sendMultipleEmail({rootState, dispatch}, email: EmailMessage): Promise<boolean> {
+       return new Promise<boolean>((resolve) => {
+            return axios.post(`${rootState.settings.apiUrl}/users/sendMultipleEmail`, email,
+                { headers: { authorization: rootState.auth.token }})
+                .then((response) => {
+                    dispatch('message/change', {
+                        mod: 'Profile',
+                        message: {
+                            state: MessageStatusEnum.Success,
+                            message: 'emailMultipleSent',
+                        },
+                    },
+                    { root: true });
+                    return resolve(response.data !== undefined);
                 })
                 .catch((error) => {
                     dispatch('message/change', {
