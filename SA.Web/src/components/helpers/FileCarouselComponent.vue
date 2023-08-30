@@ -1,13 +1,12 @@
 ﻿<template>
     <div>
-        <v-dialog v-model="isImageSelected" max-width="1000">
-            <v-layout row wrap>
-                <lingallery
-                    :iid.sync="currentId"
-                    :responsive="true"
-                    :items="gallery"
-                    baseColor="#999"></lingallery>
-            </v-layout>
+        <v-dialog v-model="isImageSelected">
+            <div style="position: absolute; top: 50%; left: 50%; margin-right: -50%; transform: translate(-50%, -50%); max-height: 80%; max-width: 70%;">
+                <lingallery :iid.sync="currentId"
+                            :responsive="true"
+                            :items="gallery"
+                            baseColor="#999"></lingallery>
+            </div>
         </v-dialog>
         <div class="fileCarousel" style="position: relative">
             <loading-component :open="isLoading" />
